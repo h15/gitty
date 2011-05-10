@@ -1,0 +1,43 @@
+% extends 'base';
+% content_for title => begin
+    Joker &rarr; list
+% end
+
+% content_for nav => begin
+% end
+
+% content_for header => begin
+% end
+
+% content_for footer => begin
+    Thanks for using Joke!
+% end
+
+% content_for body => begin
+    <article class="plugins">
+        <h2>Plugin list</h2>
+%   my $jokes = $self->stash('jokes');
+%   for my $plugin (values %$jokes) {
+%       my $active = $plugin->{'state'} & 0b001;
+%       my $invert = $plugin->{'state'} & 0b010;
+%       my $change = $plugin->{'state'} & 0b100;
+    
+        <article class="plugin rounded">
+            <a href="<%= url_for('joker_read', joke => $plugin->{'name'}) %>">
+                <%= $plugin->{'name'} %></a> (<%= $plugin->{'version'} %>)
+            <div class="actions">
+%       if ( $invert ) {
+                <div class="rounded action">
+                    <span class="<%= $active ? 'on' : 'off' %>">J</span> &rarr;
+                    <span class="<%= $active ? 'off' : 'on' %>">J</span>
+                </div>
+%       }
+%       if ( $change ) {
+                <div class="rounded on action">*</div> &nbsp;
+%       }
+                <div class="action <%= $active ? 'on' : 'off'; %> rounded">J</div>
+            </div>
+        </article>
+%   }
+    </article>
+% end

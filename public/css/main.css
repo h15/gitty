@@ -1,0 +1,260 @@
+/*
+ * COPYRIGHT AND LICENSE
+ *
+ * Copyright (C) 2011, Georgy Bazhukov.
+ *
+ * This program is free software, you can redistribute it and/or modify it under
+ * the terms of the Artistic License version 2.0.
+ */
+
+body {
+    padding:0px;
+    margin:0px;
+    font-family: Sans-Serif,'Lucida Grande';
+    color:#444;
+    font-size: 14px;
+}
+a { color: #c62; }
+img { border:0px; }
+
+/**********************
+* For HTML5 slowpokes *
+**********************/
+
+nav, header, article, footer { display: block; }
+
+/*** navigation ***/
+
+nav {
+    position:absolute; top:0px; left:0px;
+    width:100%;
+    border-bottom:1px solid #BAAC9F;
+    background:#E4DED7;
+    padding: 5px 0px 5px 0px;
+    /* Gradient */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F3F0ED', endColorstr='#D4CEC7'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#F3F0ED), to(#D4CEC7)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #F3F0ED,  #D4CEC7); /* for firefox 3.6+ */
+}
+
+nav a {
+    color: #222;
+    text-decoration:none;
+}
+
+nav a.rounded:hover {
+    color: #222;
+    background: #fff;
+}
+
+nav a.rounded {
+	padding: 0px 4px 0px 4px;
+	background: #eee;
+	color:#999;
+	border: 1px solid #e8e8e8;
+}
+
+nav div {
+    padding:0px 10px 0px 0px;
+}
+
+/*** Threads ***/
+
+.thread_post {
+    margin-top:20px;
+}
+
+.thread_post textarea {
+    width:560px;
+    margin:0px 20px 0px 20px;
+}
+
+.thread_post div {
+    margin-left:20px;
+}
+
+/*** User control panel ***/
+
+.ucp table {
+    border-color:#ddd;
+}
+
+.user_fields {
+    width:300px;
+}
+
+/*** Messages ***/
+
+.done, .error, .info, .rounded {
+	padding: 5px;
+	background:#F2F1F0;
+	border: 1px solid #ddd;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-khtml-border-radius: 5px;
+}
+
+.done, .error, .info {
+    text-align:center;
+	margin: 5px;
+}
+
+.info {
+	background: #ffd;
+	border: 1px solid #fff7dd;
+}
+
+.error {
+    background: #fee;
+    border: 1px solid #fcc;
+    margin: 50px auto;
+}
+
+.done {
+    background: #efe;
+    border: 1px solid #cfc;
+    margin: 50px auto;
+}
+
+/***************************/
+
+.wide {
+    display:block;
+    width:580px;
+}
+
+/*** wiki ***/
+
+.wiki .wide {
+    width:100%;
+}
+
+.wiki input.wide {
+    font-size:18px;
+}
+
+.wiki textarea.text {
+    height:400px;
+}
+
+
+header {
+    margin-top:50px;
+}
+
+.small {
+    font-size:10px;
+    color:#ccc;
+    text-decoration:none;
+}
+
+.hidden {
+    display:none;
+}
+
+body header h1 {
+    color:#bbb;
+    border-bottom:3px solid #ddd;
+}
+
+footer {
+    text-align: center;
+    color: #aaa;
+    font-style:italic;
+    padding:5px;
+}
+
+article.page {
+	margin:0px auto;
+}
+
+article.page td {
+    padding: 5px;
+}
+
+.page {
+	margin:0px auto;
+	width:600px;
+	color:#222;
+	font-family:Sans, Arial;
+}
+
+td.changeable {
+    border:1px solid #ddd;
+}
+
+.alignright {
+    float:right;
+}
+
+.plugin {
+    margin-top:5px;
+    padding: 10px;
+}
+
+.actions {
+    float:right;
+}
+
+a.action:hover {
+    background-color:#ddd;
+}
+
+.action {
+    float:left;
+    display:inline;
+    padding:5px 10px 5px 10px;
+    margin:-6px 0px 0px 10px;
+}
+
+.plugins {
+    margin:0px auto;
+    width:600px;
+}
+
+.plugins h2 {
+    color:#ccc;
+}
+
+.on, a.on {
+    font-weight:bold;
+    color:#a00;
+    font-family:"Times new roman";
+    text-decoration: none;
+    display:inline;
+}
+
+.off, a.off {
+    font-weight:bold;
+    color:#ccc;
+    font-family:"Times new roman";
+    text-decoration: none;
+    display:inline;
+}
+
+.post {
+	margin: 5px 0px;
+}
+
+table {
+    color:#ddd;
+}
+
+td {
+    color:#222;
+}
+
+/*** Align ***/
+
+.aligncenter {
+    margin:auto;
+}
+
+.alignright {
+    float:right;
+}
+
+.alignleft {
+    float:left;
+}

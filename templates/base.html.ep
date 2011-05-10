@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang=ru>
+  <head>
+    <meta charset=utf-8>
+    %= stylesheet '/css/main.css'
+    %= javascript '/js/main.js'
+    <link rel=icon href="/favicon.ico" sizes="32x32" type="image/png">
+    <title>
+      %= content_for 'title'
+    </title>
+  </head>
+  <body>
+    <div class=page>
+      <nav>
+        <div class=alignright>
+% if ( user->data->{'id'} > 1 ) {
+            <a href="<%= url_for('users_read', id => user->data->{'id'}) %>"><%= user->data->{'name'} %></a>
+            <a href="<%= url_for('auths_logout') %>" class=rounded>x</a>
+% } else {
+            <a href="<%= url_for('auths_login') %>"><%=l 'login' %></a>
+% }
+        </div>
+        %= content_for 'nav'
+      </nav>
+      <header>
+        %= content_for 'header'
+% unless ( user->is_active ) {
+        <div class=info><%=l 'Your account has been blocked.' %>
+            <a href="<%= url_for('auths_logout') %>"><%=l 'logout' %></a></div>
+% }
+      </header>
+        %= content_for 'body'
+      <footer>
+        %= content_for 'footer'
+      </footer>
+    </div>
+  </body>
+</html>

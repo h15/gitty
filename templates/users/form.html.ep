@@ -1,0 +1,41 @@
+% extends 'base';
+% content_for title => begin
+    <%=l "Register new user" %>
+% end
+
+% content_for nav => begin
+% end
+
+% content_for header => begin
+% end
+
+% content_for footer => begin
+% end
+
+<%= content body => begin %>
+<article class=page>
+    <form method=post action="<%= url_for('users_create') %>">
+	    <table class="aligncenter rounded">
+	        <tr>
+	            <td>
+	                <%=l 'e-mail' %>
+	            </td>
+	            <td>
+	                <input name=mail>
+	            </td>
+	        </tr>
+	        <tr>
+	            <td colspan=2>
+	                <%= captcha_html %>
+	            </td>
+	        </tr>
+	        <tr>
+	            <td>
+	            </td>
+	            <td>
+	                <input type=submit class="alignright">
+	            </td>
+	        </tr>
+	    </table>
+</article>
+<% end %>

@@ -1,0 +1,5 @@
+<h1><%= $title %></h1>
+<p>
+<a href="<%= $host . url_for( 'auths_mail_confirm' ) %>?mail=<%= $mail %>&key=<%= $key %>">Confirm via e-mail</a>.
+</p>
+

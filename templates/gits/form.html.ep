@@ -1,0 +1,30 @@
+% extends 'base';
+% content_for title => begin
+    <%=l "Create new repo" %>
+% end
+
+% content_for nav => begin
+% end
+
+% content_for header => begin
+    <h1><%=l "Create new repo" %></h1>
+% end
+
+% content_for footer => begin
+% end
+
+<%= content body => begin %>
+<article class=page>
+    <form method=post action="<%= url_for('gits_create') %>">
+	    <div class="aligncenter rounded">
+            <%=l 'name' %>
+	        <input name=name class=wide>
+            <%=l 'members' %>
+            <textarea name=members class=wide></textarea>
+            <%=l 'description' %>
+            <textarea name=desc class=wide></textarea>
+            <%= captcha_html %>
+            <input type=submit class="alignright">
+	    </div>
+</article>
+<% end %>

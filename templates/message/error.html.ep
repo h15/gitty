@@ -1,0 +1,8 @@
+% extends 'base';
+% content_for body => begin
+    <div class=page>
+        <div class="rounded error">
+            <%= $message %>
+        </div>
+    </div><!--
+% end

@@ -1,0 +1,89 @@
+% extends 'base';
+% content_for title => begin
+    Joker &rarr; <%= $title %>
+% end
+
+% content_for nav => begin
+% end
+
+% content_for header => begin
+% end
+
+% content_for footer => begin
+    Thanks for using Joke!
+% end
+
+% content_for body => begin
+% my $plugin = $joke;
+% my $active = $plugin->{'state'} & 0b001;
+% my $invert = $plugin->{'state'} & 0b010;
+% my $change = $plugin->{'state'} & 0b100;
+%
+<article class="plugins">
+    <header>
+    <h2><a class="on rounded action" href="<%= url_for('joker_list') %>">J</a>&nbsp;&rarr;
+        <%= $plugin->{'name'} %></h2>
+    </header>
+%#
+%#          Show notifications
+%#
+% if ( $invert ) {
+    <div class="info">
+        Joke should be restarted to turn it <%= $active ? 'off' : 'on' %>.
+    </div>
+% }
+% if ( $change ) {
+    <div class="info">
+        Joke should be restarted to apply changes.
+    </div>
+% }
+    <div class="actions">
+        <div class="action <%= $active ? 'on' : 'off' %> rounded">J</div>
+    </div>
+%#
+%#          PLUGIN's INFO
+%#
+<div class="plugins rounded">
+    <table class="simple_table">
+        <tr>
+            <td>about</td>
+            <td><%= $plugin->{'about'} %>
+                <a href=<%= url_for('joker_toggle', joke => $plugin->{'name'}) %>>
+                    Turn it <%= ($active xor $invert) ? 'off' : 'on' %>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>version</td>
+            <td><%= $plugin->{'version'} %></td>
+        </tr>
+        <tr>
+            <td>depends</td>
+            <td>
+%#
+%#          LIST OF DEPS
+%#
+% for my $dep ( @{$plugin->{'depends'}} ) {
+    <a href="<%= url_for('joker_read', joke => $dep)%>"><%= $dep %></a>&nbsp;
+% }
+            </td>
+        </tr>
+        <tr>
+            <td>config</td>
+            <td>
+% if ( keys %{$plugin->{config}} ) {
+<form action="<%= url_for('joker_update', joke => $plugin->{'name'}) %>"
+    method=POST>
+%== html_hash_tree( $plugin->{config} );
+    <input type="submit" class="alignright">
+</form>
+% }
+% else {
+    empty
+% }
+            </td>
+        </tr>
+    </table>
+</div>
+</article>
+% end

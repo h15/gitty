@@ -1,0 +1,41 @@
+% extends 'base';
+% content_for title => begin
+    Login
+% end
+
+% content_for nav => begin
+% end
+
+% content_for header => begin
+% end
+
+% content_for footer => begin
+% end
+
+%= content body => begin
+<div class=page>
+    <form method=post action="<%= url_for('auths_mail_request') %>">
+	    <table class="aligncenter rounded">
+	        <tr>
+	            <td>
+	                <%=l 'e-mail' %>
+	            </td>
+	            <td>
+	                <input name=mail>
+	            </td>
+	        </tr>
+	        <tr>
+	            <td colspan=2>
+	                <%= captcha_html %>
+	            </td>
+	        </tr>
+	        <tr>
+	            <td>
+	            </td>
+	            <td>
+	                <input type=submit value="<%=l 'send' %>" class="alignright">
+	            </td>
+	        </tr>
+	    </table>
+</div>
+% end

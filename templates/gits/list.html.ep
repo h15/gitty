@@ -1,0 +1,27 @@
+% extends 'base';
+% content_for title => begin
+    Git list
+% end
+
+% content_for nav => begin
+% end
+
+% content_for header => begin
+% end
+
+% content_for footer => begin
+% end
+
+% content_for body => begin
+    <article class="plugins">
+        <h2>Repository list</h2>
+%   for my $r (@$repos) {
+    
+        <article class="plugin rounded">
+            <a href="<%= url_for( 'gits_read', repo => $r ) %>">
+                <%= $r %>
+            </a>
+        </article>
+%   }
+    </article>
+% end
