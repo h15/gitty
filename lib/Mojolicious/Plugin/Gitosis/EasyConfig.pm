@@ -2,6 +2,10 @@ package Mojolicious::Plugin::Gitosis::EasyConfig;
 use strict;
 use warnings;
 
+use POSIX qw (locale_h);
+setlocale(LC_CTYPE, 'ru_RU.UTF-8');
+setlocale(LC_ALL  , 'ru_RU.UTF-8');
+
 our $VERSION = 0.1;
 
 sub new {
