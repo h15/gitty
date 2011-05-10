@@ -19,7 +19,7 @@ sub register {
         $self->stash(
             %$data,
             title => $title,
-            host  => $config->{site},
+            host  => $conf->{site},
         );
         
         my $html = $self->render (
