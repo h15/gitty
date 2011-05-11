@@ -45,6 +45,10 @@ Users' accounts need some data for save.
 
     INSERT INTO `gitty__users` (`id`, `groups`, `name`, `mail`, `regdate`, `password`, `ban_reason`, `ban_time`, `confirm_key`, `confirm_time`) VALUES(1, '', 'anonymous', 'anonymous@lorcode.org', 0, '0', 0, 0, '', 0);
 
+=head1 Run
+
+    ./script/gitty daemon
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2011, Georgy Bazhukov.

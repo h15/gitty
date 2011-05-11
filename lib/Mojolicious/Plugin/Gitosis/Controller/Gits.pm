@@ -12,6 +12,8 @@ sub create_repo {
     my @members = split /\s+/, $self->param('members');
     push @members, $self->user->data->{id} unless grep {$_ == $self->user->data->{id}} @members;
     
+    map { "u$_" } @members;
+    
     $self->gitosis->add_group ({
         $self->param('name') => {
             members => \@members,
@@ -77,7 +79,7 @@ sub update {
 sub add_key {
     my $self = shift;
     
-    open F, '>', $self->stash('dir') . 'keydir/' . $self->user->data->{id} . '.pub';
+    open F, '>', $self->stash('dir') . 'keydir/u' . $self->user->data->{id} . '.pub';
     print F $self->param('key');
     close F;
     

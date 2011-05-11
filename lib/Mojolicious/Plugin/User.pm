@@ -15,6 +15,7 @@ sub register {
     
     $app->secret( $conf->{cookies} );
     $app->sessions->default_expiration( 3600 * 24 * $conf->{confirm} );
+    $app->stash( user => $conf );
     
     # Run on any request!
     $app->hook( before_dispatch => sub {

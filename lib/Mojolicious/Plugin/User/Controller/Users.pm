@@ -48,10 +48,12 @@ sub create {
         }
     );
     
+    my $cfg = $self->stash('user');
+    
     $self->data->create( users => {
         mail    => $self->param('mail'),
         regdate => time,
-        confirm_time => time + 86400 * $self->joker->jokes->{User}->{config}->{confirm},
+        confirm_time => time + 86400 * $cfg->{confirm},
         confirm_key  => $key
     });
     

@@ -50,10 +50,12 @@ sub mail_request {
     # Generate and save confirm key.
     my $confirm_key = Digest::MD5::md5_hex(rand);
     
+    my $cfg = $self->stash('user');
+    
     $self->data->update( users =>
         {
             confirm_key  => $confirm_key,
-            confirm_time => time + 3600 * 24 * $self->joker->jokes->{User}->{config}->{confirm}
+            confirm_time => time + 86400 * $cfg->{confirm}
         },
         { mail => $self->param('mail') }
     );
@@ -78,8 +80,10 @@ sub mail_confirm {
     # This pair does not exist.
     return $self->error('Auth failed!') unless defined %$user;
     
+    my $cfg = $self->stash('user');
+    
     # Too late
-    if ( $user->{confirm_time} > time + 86400 * $self->joker->jokes->{User}->{config}->{confirm} ) {
+    if ( $user->{confirm_time} > time + 86400 * $cfg->{confirm} ) {
         $self->data->update( user =>
             { confirm_key => '', confirm_time => 0 },
             { mail => $mail }
