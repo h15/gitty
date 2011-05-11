@@ -63,8 +63,8 @@ sub read {
 sub update {
     my $self = shift;
     
-    my $repo  = $self->gitosis->find_repo ( $self->param('repo') );
-    my $group = $self->gitosis->find_group( $self->param('repo') );
+    my $repo  = $self->gitosis->find_repo ( $self->param('repo' ) );
+    my $group = $self->gitosis->find_group( $self->param('group') );
     
     return $self->error('Repo does not exist') unless $group;
     

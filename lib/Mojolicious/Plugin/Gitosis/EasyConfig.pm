@@ -37,8 +37,6 @@ sub new {
             elsif ( $line =~ /^\s*description\s*=\s*$list\s*$/i ) { $obj->{repos}->{$r}->{desc} = $1 }
         }
         close F;
-        
-        # delete $obj->{groups}->{'gitosis-admin'};
     }
     else {
         print STDERR "\n[-]\tNeed file name!\n"             unless exists $args->{file};
