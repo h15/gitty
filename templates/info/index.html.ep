@@ -1,0 +1,36 @@
+% extends 'base';
+% content_for title => begin
+    Добро пожаловать в Gitty!
+% end
+
+% content_for nav => begin
+% end
+
+% content_for header => begin
+    Добро пожаловать в Gitty!
+% end
+
+% content_for footer => begin
+% end
+
+%= content body => begin
+<article class="page">
+    <p>Добрый день!</p>
+    <p>
+        Вас приветствует Gitty &mdash; система непрерывной интеграции.
+        Чтобы начать работу с системой, зарегистрируйтесь и войдите в систему.
+    </p>
+    <p>
+        Администратор имеет логин "admin" и пароль "admin". Смените пароль при первом же
+        входе в систему.
+    </p>
+    <p>Информацию о том, как установить и настроить gitosis, Вы можете получить <a href="<%= url_for('install_gitosis') %>">здесь</a>.
+    </p>
+    <p>
+        Данное сообщение вы можете отредактировать в файле <code>./templates/info/index.html.ep</code>.
+    </p>
+    <p>
+        Спасибо, что используете Gitty!
+    </p>
+</article>
+% end

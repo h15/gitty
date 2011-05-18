@@ -58,6 +58,43 @@ nav div {
     padding:0px 10px 0px 0px;
 }
 
+/*** Comboboxes ***/
+
+.combobox {
+    float:left;
+	position:absolute;
+	left:0px;
+	top:3px;
+	display:inline;
+    margin-left:20px;
+	background:#F2F1F0;
+    padding:2px 0px 2px 0px;
+    width:150px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-khtml-border-radius: 5px;
+}
+
+.combobox div {
+    padding:0px 5px 0px 5px;
+    margin:0px;
+}
+
+#git_combobox div {
+/*    border-top:1px solid #aaa;*/
+    margin:2px 0px 0px 0px;
+    padding:4px 0px 2px 0px;
+}
+
+#git_combobox {
+    display:none;
+}
+
+.combobox #git {
+    display:inline;
+}
+
 /*** Threads ***/
 
 .thread_post {

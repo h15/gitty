@@ -9,7 +9,12 @@ sub update {
 }
 
 sub is_active {
-    shift->data->{ban_reason} == 0 ? 1 : 0;
+    my $self = shift;
+    
+    return 0 if $self->data->{id} == 1;
+    return 0 if $self->data->{ban_reason} != 0;
+    
+    return 1;
 };
 
 sub is_admin {

@@ -7,7 +7,7 @@
 % end
 
 % content_for header => begin
-    <h1><%=l "Create new repo" %></h1>
+    <%=l "Create new repo" %>
 % end
 
 % content_for footer => begin

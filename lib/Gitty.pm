@@ -8,6 +8,11 @@ sub startup {
     # Plugins
     $app->plugin('i18n');
     $app->plugin('message');
+    $app->plugin('captcha');
+    
+    #
+    #   Config is here
+    #
     $app->plugin( sql => {
         host    => 'dbi:mysql:gitty',
         user    => 'gitty',
@@ -19,14 +24,27 @@ sub startup {
         confirm => 7,                       # time to live of session in days;
         salt    => 'some random string',    # random string for db salt;
     });
-    $app->plugin('captcha');
     $app->plugin( mail => {
         site => 'http://lorcode.org:3000/',
         from => 'no-reply@lorcode.org'
     });
     $app->plugin( gitosis => {
-        git_home => '/home/h15/gitosis-admin/'
+        git_home => '/home/h15/gitosis/gitosis-admin/'
     });
+    #
+    #   End of config
+    #
+    
+    # Routes
+    my $r = $app->routes;
+    $r->route('/')->via('get')->to(cb => sub { shift->render( template => 'info/index' ) })->name('index');
+    
+    # Help info
+    $r = $app->routes->route('/help/git');
+    $r->route('/install_gitosis')->via('get')
+        ->to(cb => sub { shift->render( template => 'info/git/install_gitosis' ) })->name('install_gitosis');
+    $r->route('/init')->via('get')->to(cb => sub { shift->render( template => 'info/git/init' ) })
+        ->name('git_init');
     
     # Helpers
     $app->helper (
@@ -115,6 +133,53 @@ sub startup {
         }
     );
 }
+
+package Gitty::I18N::ru;
+use base 'Gitty::I18N';
+
+use Encode 'decode';
+
+our %Lexicon = (
+    _AUTO => 1,
+    'Repo'          => 'Репозиторий',
+    'New repo'      => 'Создать новый',
+    'Add key'       => 'Добавить ключ',
+    'name'          => 'имя',
+    'members'       => 'пользователи',
+    'description'   => 'описание',
+    'password'      => 'пароль',
+    'repeat'        => 'повторить',
+    'registered'    => 'зарегистрирован',
+    'ban reason'    => 'причина блокировки',
+    'ban time'      => 'время блокировки',
+    'now'           => 'сейчас',
+    'Add'           => 'Добавить',
+    'status'        => 'статус',
+    'active'        => 'активный',
+    'inactive'      => 'деактивирован',
+    'week'          => 'неделя',
+    'day'           => 'день',
+    'hour'          => 'час',
+    
+    'mins1'         => 'минуту',
+    'mins2'         => 'минуты',
+    'mins5'         => 'минут',
+    
+    'hours1'        => 'час',
+    'hours2'        => 'часа',
+    'hours5'        => 'часов',
+    
+    'ago'           => 'назад',
+    
+    'a few seconds ago' => 'несколько секунд назад',
+    'Your public key'   => 'Ваш публичный ключ',
+    'Create new repo'   => 'Создать новый репозиторий',
+    'Repository list'   => 'Список репозиториев',
+    'change password'   => 'сменить пароль',
+    'How to create new repository' => 'Как создать новый репозиторий',
+);
+
+$Lexicon{$_} = decode('utf8', $Lexicon{$_}) for keys %Lexicon;
 
 1;
 

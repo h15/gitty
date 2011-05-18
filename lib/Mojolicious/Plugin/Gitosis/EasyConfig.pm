@@ -2,9 +2,9 @@ package Mojolicious::Plugin::Gitosis::EasyConfig;
 use strict;
 use warnings;
 
-use POSIX qw (locale_h);
-setlocale(LC_CTYPE, 'ru_RU.UTF-8');
-setlocale(LC_ALL  , 'ru_RU.UTF-8');
+#use POSIX qw (locale_h);
+#setlocale(LC_CTYPE, 'ru_RU.UTF-8');
+#setlocale(LC_ALL  , 'ru_RU.UTF-8');
 
 our $VERSION = 0.1;
 
@@ -39,9 +39,9 @@ sub new {
         close F;
     }
     else {
-        print STDERR "\n[-]\tNeed file name!\n"             unless exists $args->{file};
-        print STDERR "\n[-]\tCan't read config file!\n"     unless -r $args->{file};
-        print STDERR "\n[-]\tCan't write to config file!\n" unless -w $args->{file};
+        print STDERR "[-] Need file name!\n"             unless exists $args->{file};
+        print STDERR "[-] Can't read config file!\n"     unless -r $args->{file};
+        print STDERR "[-] Can't write to config file!\n" unless -w $args->{file};
     }
     
     bless $obj;

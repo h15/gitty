@@ -27,6 +27,11 @@ use SQL::Abstract;
 sub new {
     my ( $self, $conf ) = @_;
     
+    if( $conf->{user} eq 'gitty' && $conf->{passwd} eq 'password' ) {
+        die "[-] Please change default data base params.\n",
+            "    You can get more information in README file.\n"
+    }
+    
     # init database handler.
     my $h = DBIx::Simple->connect (
         @$conf{ qw/host user passwd/ },

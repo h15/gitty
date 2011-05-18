@@ -4,15 +4,17 @@ use Mojo::Base 'Mojolicious::Controller';
 sub create_repo {
     my $self = shift;
     
+    return $self->error('Must be logged in')    unless $self->user->is_active;
+    
     return $self->error('Wrong name format')    if $self->param('name')    !~ $self->gitosis->{word};
     return $self->error('Wrong members format') if $self->param('members') !~ m/(?:\s*\d+\s*)*/;
     return $self->error('Wrong desc format')    if $self->param('desc')    !~ $self->gitosis->{list};
     return $self->error('Already exists')       if $self->gitosis->find_group( $self->param('name') );
     
     my @members = split /\s+/, $self->param('members');
-    push @members, $self->user->data->{id} unless grep {$_ == $self->user->data->{id}} @members;
+    unshift @members, $self->user->data->{id} unless grep {$_ == $self->user->data->{id}} @members;
     
-    map { "u$_" } @members;
+    @members = map { "u$_" } @members;
     
     $self->gitosis->add_group ({
         $self->param('name') => {
@@ -49,7 +51,7 @@ sub read {
     
     return $self->error('Repo does not exist') unless $group;
     
-    my $desc = $repo ? $repo->{desc} : '';
+    my $desc = ( $repo ? $repo->{desc} : '' );
     
     $self->stash (
         desc    => $desc,
@@ -63,13 +65,28 @@ sub read {
 sub update {
     my $self = shift;
     
-    my $repo  = $self->gitosis->find_repo ( $self->param('repo' ) );
-    my $group = $self->gitosis->find_group( $self->param('group') );
+    return $self->error('Must be logged in') unless $self->user->is_active;
     
-    return $self->error('Repo does not exist') unless $group;
+    my $repo  = $self->gitosis->find_repo ( $self->param('name') );
+    my $group = $self->gitosis->find_group( $self->param('name') );
     
-    $repo->{desc} = $self->param('desc');
-    $group->{members} = [ split /\s+/, $self->param('members') ];
+    return $self->error('Repo does not exist') unless defined %$group;
+    
+    my @members = split /\s+/, $self->param('members');
+    return $self->error('You are not owner') if 'u'.$self->user->data->{id} ne $members[0];
+    
+    if ( $repo ) {
+        $repo->{desc} = $self->param('desc');
+    }
+    else {
+        $self->gitosis->add_repo({
+            $self->param('name') => {
+                desc => $self->param('desc')
+            }
+        });
+    }
+    
+    $group->{members} = \@members;
     
     $self->gitosis->save;
     
@@ -78,6 +95,8 @@ sub update {
 
 sub add_key {
     my $self = shift;
+    
+    return $self->error('Must be logged in') unless $self->user->is_active;
     
     open F, '>', $self->stash('dir') . 'keydir/u' . $self->user->data->{id} . '.pub';
     print F $self->param('key');

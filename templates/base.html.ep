@@ -1,3 +1,4 @@
+% languages 'ru';
 <!doctype html>
 <html lang=ru>
   <head>
@@ -12,19 +13,33 @@
   <body>
     <div class=page>
       <nav>
+        <div class="combobox">
+            <div class=active id=git>
+                <a href="<%= url_for('gits_read') %>"><%=l 'Repo' %></a>
+                <div class=alignright><a href="#" onclick="hide('git_combobox')">&nabla;</a></div>
+            </div>
+            
+            <div id=git_combobox>
+                <a href="<%= url_for('gits_new') %>"><div><%=l 'New repo' %></div></a>
+                <a href="<%= url_for('gits_key') %>"><div><%=l 'Add key' %></div></a>
+            </div>
+        </div>
         <div class=alignright>
 % if ( user->data->{'id'} > 1 ) {
             <a href="<%= url_for('users_read', id => user->data->{'id'}) %>"><%= user->data->{'name'} %></a>
             <a href="<%= url_for('auths_logout') %>" class=rounded>x</a>
 % } else {
-            <a href="<%= url_for('auths_login') %>"><%=l 'login' %></a>
+            <a href="<%= url_for('auths_login') %>"><%=l 'login' %></a> / 
+            <a href="<%= url_for('users_create') %>"><%=l 'register' %></a>
 % }
         </div>
         %= content_for 'nav'
       </nav>
       <header>
+        <h1>
         %= content_for 'header'
-% unless ( user->is_active ) {
+        </h1>
+% if ( user->data->{ban_reason} ) {
         <div class=info><%=l 'Your account has been blocked.' %>
             <a href="<%= url_for('auths_logout') %>"><%=l 'logout' %></a></div>
 % }

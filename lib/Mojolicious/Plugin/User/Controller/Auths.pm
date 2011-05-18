@@ -84,12 +84,17 @@ sub mail_confirm {
     
     # Too late
     if ( $user->{confirm_time} > time + 86400 * $cfg->{confirm} ) {
-        $self->data->update( user =>
+        $self->data->update( users =>
             { confirm_key => '', confirm_time => 0 },
             { mail => $mail }
         );
         return $self->error('Auth failed (too late)!');
     }
+    
+    $self->data->update( users =>
+        { confirm_key => '', confirm_time => 0 },
+        { mail => $mail }
+    );
     
     my $user = $self->data->read_one(users => {mail => $mail});
     

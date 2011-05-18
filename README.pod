@@ -18,6 +18,11 @@ Now it can makes and use Users, tunes gitosis config, adds public keys.
 
     curl -L cpanmin.us | perl - Mojolicious DBIx::Simple SQL::Abstract MIME::Lite
 
+=head2 Change default configuration.
+
+Normally all configuration consists in C<./lib/Gitty.pm> file.
+You should change it to protect your service.
+
 =head2 Create data base and tables.
 
 Users' accounts need some data for save.
@@ -48,6 +53,37 @@ Users' accounts need some data for save.
 =head1 Run
 
     ./script/gitty daemon
+
+=head1 Errors
+
+    [-] Please change default data base params.
+        You can get more information in README file.
+
+You can see this message if you use default data base params or do not set yours params.
+To fix it edit config in file C<./lib/Gitty.pm>.
+
+    [-] Need file name!
+    [-] Can't read config file!
+    [-] Can't write to config file!
+
+This messages talks you, that Gitty cann't use correctly gitosis' configuration file.
+What Gitty needs:
+
+=item Define path to file
+
+Did you defined correct path to gitosis config file in C<./lib/Gitty.pm>?
+
+=item Exists
+
+Does file exists by path defined in Gitty config?
+
+=item Readable
+
+Gitosis config should be readable for Gitty.
+
+=item Writable
+
+Gitosis config should be writable for Gitty if you want use Gitty for configuration gitosis.
 
 =head1 COPYRIGHT AND LICENSE
 

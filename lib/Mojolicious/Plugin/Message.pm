@@ -11,7 +11,7 @@ sub register {
         # Too much bullets to live.
         fatal => sub {
             my ($self, $message) = @_;
-            croak qq/Dead sad: "$message"\n/;
+            croak qq/Fatal error: "$message"\n/;
         }
     );
     

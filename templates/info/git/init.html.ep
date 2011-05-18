@@ -1,0 +1,35 @@
+% extends 'info/base';
+
+%= content title => begin
+Как пользоваться git
+% end
+
+%= content header => begin
+Как пользоваться git
+% end
+
+%= content body => begin
+<ol>
+    <li>Добавьте Ваш <a href="<%= url_for('gits_key') %>">публичный ключ</a> и <a href="<%= url_for('gits_new') %>">создайте репозиторий</a> на сервере через интерфейс Gitty.
+        Это может занять некоторое время (до минуты после отправки запроса).
+    </li>
+    <li>Создайте git репозиторий у себя на компютере:
+        <pre>
+mkdir my_repo
+cd my_repo
+git init
+git remote add origin git@имя_сервера:имя_вашего_репозитроия.git
+echo -n 'first commit' > README
+git add .
+git commit -m 'first commit'
+git push origin master
+        </pre>
+    </li>
+    <li>Теперь Ваш репозиторий создан и любой пользователь, указанный в поле "пользователи" Вашего репозитория,
+        может получить доступ к данным, отправленным на сервер, используя
+<pre>
+git clone git@имя_сервера:имя_вашего_репозитроия.git
+</pre>
+    </li>
+</ol>
+% end
