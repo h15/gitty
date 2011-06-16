@@ -16,7 +16,7 @@ sub startup {
     $app->plugin( sql => {
         host    => 'dbi:mysql:gitty',
         user    => 'gitty',
-        passwd  => 'password',
+        passwd  => 'gitty',
         prefix  => 'gitty__',
     });
     $app->plugin( user => {

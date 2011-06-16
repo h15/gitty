@@ -36,9 +36,11 @@
         %= content_for 'nav'
       </nav>
       <header>
+% if ( content_for 'header' ) {
         <h1>
         %= content_for 'header'
         </h1>
+% }
 % if ( user->data->{ban_reason} ) {
         <div class=info><%=l 'Your account has been blocked.' %>
             <a href="<%= url_for('auths_logout') %>"><%=l 'logout' %></a></div>
