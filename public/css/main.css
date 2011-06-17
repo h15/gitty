@@ -8,11 +8,11 @@
  */
 
 body {
-    padding:0px;
-    margin:0px;
-    font-family: Sans-Serif,'Lucida Grande';
-    color:#444;
-    font-size: 14px;
+  padding:0px;
+  margin:0px;
+  font-family: Sans-Serif,'Lucida Grande';
+  color:#444;
+  font-size: 14px;
 }
 a { color: #c62; }
 img { border:0px; }
@@ -26,15 +26,11 @@ nav, header, article, footer { display: block; }
 /*** navigation ***/
 
 nav {
-    position:absolute; top:0px; left:0px;
-    width:100%;
-    border-bottom:1px solid #BAAC9F;
-    background:#E4DED7;
-    padding: 5px 0px 5px 0px;
-    /* Gradient */
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F3F0ED', endColorstr='#D4CEC7'); /* for IE */
-    background: -webkit-gradient(linear, left top, left bottom, from(#F3F0ED), to(#D4CEC7)); /* for webkit browsers */
-    background: -moz-linear-gradient(top,  #F3F0ED,  #D4CEC7); /* for firefox 3.6+ */
+  position:absolute; top:0px; left:0px;
+  width:100%;
+/*  border-bottom:1px solid #a49e97;  */
+  padding: 4px 0px 3px 0px;
+	height:22px;
 }
 
 nav a {
@@ -55,25 +51,52 @@ nav a.rounded {
 }
 
 nav div {
-    padding:0px 10px 0px 0px;
+    padding:0px;
 }
 
 /*** Comboboxes ***/
 
-.combobox {
-    float:left;
+.combobox-container {
+  float:left;
 	position:absolute;
-	left:0px;
+	left:10px;
 	top:3px;
 	display:inline;
-    margin-left:20px;
-	background:#F2F1F0;
-    padding:2px 0px 2px 0px;
-    width:150px;
+}
+
+.right-combobox-container div {
+  margin-right:10px;
+}
+
+.combobox {
+  margin-left:10px;
+  padding:1px 0px 1px 0px;
+  width:150px;
+  float:left;
+/*	background:#d4cec7;  */
+  border:#a49e97 solid 1px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	-khtml-border-radius: 5px;
+	  /* Gradient */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F3F0ED', endColorstr='#b4aea7'); /* for IE */
+  background: -webkit-gradient(linear, left top, left bottom, from(#F3F0ED), to(#b4aea7)); /* for webkit browsers */
+  background: -moz-linear-gradient(top,  #f3f0ed,  #b4aea7); /* for firefox 3.6+ */
+}
+
+.combobox:hover {
+	background:#f3f0ed;
+  border:#b4aea7 solid 1px;
+	/* Gradient */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F3F0ED', endColorstr='#d4cec7'); /* for IE */
+  background: -webkit-gradient(linear, left top, left bottom, from(#F3F0ED), to(#d4cec7)); /* for webkit browsers */
+  background: -moz-linear-gradient(top,  #f3f0ed,  #d4cec7); /* for firefox 3.6+ */
+}
+
+.combobox .unpressed {
+/*	background:#f3f0ed;
+  border:#b4aea7 solid 1px; */
 }
 
 .combobox div {
@@ -93,6 +116,13 @@ nav div {
 
 .combobox #git {
     display:inline;
+}
+
+#login_combobox {
+  position:absolute;
+  right:10px;
+  top:23px;
+  border:#a49e97 solid 1px;
 }
 
 /*** Threads ***/

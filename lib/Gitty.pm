@@ -150,6 +150,7 @@ our %Lexicon = (
     'password'      => 'пароль',
     'repeat'        => 'повторить',
     'registered'    => 'зарегистрирован',
+    'register'      => 'зарегистрировать',
     'ban reason'    => 'причина блокировки',
     'ban time'      => 'время блокировки',
     'now'           => 'сейчас',
@@ -160,6 +161,10 @@ our %Lexicon = (
     'week'          => 'неделя',
     'day'           => 'день',
     'hour'          => 'час',
+    
+    'Add server'    => 'Добавить сервер',
+    
+    'index'         => 'Главная',
     
     'mins1'         => 'минуту',
     'mins2'         => 'минуты',
@@ -177,6 +182,7 @@ our %Lexicon = (
     'Repository list'   => 'Список репозиториев',
     'change password'   => 'сменить пароль',
     'How to create new repository' => 'Как создать новый репозиторий',
+    'Add server public key'        => 'Добавить публичный ключ сервера',
 );
 
 $Lexicon{$_} = decode('utf8', $Lexicon{$_}) for keys %Lexicon;

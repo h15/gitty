@@ -105,6 +105,18 @@ sub add_key {
     $self->done('Key added');
 }
 
+sub add_server_key {
+    my $self = shift;
+    
+    return $self->error('Must be logged in') unless $self->user->is_active;
+    
+    open F, '>', $self->stash('dir') . 'keydir/s' . $self->user->data->{id} . '.pub';
+    print F $self->param('key');
+    close F;
+    
+    $self->done('Key added');
+}
+
 1;
 
 __END__

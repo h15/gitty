@@ -16,6 +16,10 @@ document.createElement('nav');
 document.createElement('article');
 document.createElement('footer');
 
+/* Initial code */
+
+$()
+
 /* Functions */
 
 function hide(id) {

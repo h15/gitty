@@ -4,6 +4,7 @@
   <head>
     <meta charset=utf-8>
     %= stylesheet '/css/main.css'
+    %= stylesheet 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js'
     %= javascript '/js/main.js'
     <link rel=icon href="/favicon.ico" sizes="32x32" type="image/png">
     <title>
@@ -13,37 +14,84 @@
   <body>
     <div class=page>
       <nav>
-        <div class="combobox">
+      
+<!--
+    Left combobox container
+-->
+        <div class=left-combobox-container>
+          <!-- combobox for index -->
+          <div class="combobox">
+            <a href="/">
+              <div><%=l 'index' %></div>
+            </a>
+          </div>
+          <div class="combobox">
+          <!-- combobox for git -->
             <div class=active id=git>
-                <a href="<%= url_for('gits_read') %>"><%=l 'Repo' %></a>
-                <div class=alignright><a href="#" onclick="hide('git_combobox')">&nabla;</a></div>
+              <a href="<%= url_for('gits_read') %>"><%=l 'Repo' %></a>
+              <div class=alignright><a href="#" onclick="hide('git_combobox');return false;">&nabla;</a></div>
             </div>
-            
+            <!-- Additional boxes -->
             <div id=git_combobox>
-                <a href="<%= url_for('gits_new') %>"><div><%=l 'New repo' %></div></a>
-                <a href="<%= url_for('gits_key') %>"><div><%=l 'Add key' %></div></a>
+              <a href="<%= url_for('gits_new') %>"><div><%=l 'New repo' %></div></a>
+              <a href="<%= url_for('gits_key') %>"><div><%=l 'Add key' %></div></a>
+              <a href="<%= url_for('gits_server_key_form') %>"><div><%=l 'Add server' %></div></a>
             </div>
+          </div>
         </div>
-        <div class=alignright>
-% if ( user->data->{'id'} > 1 ) {
+        
+<!--
+    Right combobox container
+-->
+        <div class=right-combobox-container>
+        % if ( user->data->{'id'} > 1 ) {
+          <div>
             <a href="<%= url_for('users_read', id => user->data->{'id'}) %>"><%= user->data->{'name'} %></a>
             <a href="<%= url_for('auths_logout') %>" class=rounded>x</a>
-% } else {
-            <a href="<%= url_for('auths_login') %>"><%=l 'login' %></a> / 
-            <a href="<%= url_for('users_create') %>"><%=l 'register' %></a>
-% }
+          </div>
+        % } else {
+          <div class="alignright">
+            <div class="combobox">
+            <!-- combobox for login -->
+              <a href="<%= url_for('auths_login') %>" onClick="hide('login_combobox');return false;"><div><%=l 'login' %></div></a>
+            </div>
+          </div>
+          <!-- Additional combobox. Login form -->
+          <div style="display:none" id=login_combobox class="aligncenter rounded">
+            <form method=post action="<%= url_for('auths_login') %>">
+              <table>
+                <tr><td><%=l 'e-mail' %></td>
+                  <td><input name=mail></td>
+                </tr><tr>
+                  <td><%=l 'password' %></td>
+                  <td><input type=password name=passwd></td>
+                </tr><tr>
+                  <td colspan=2 style="text-align:center"><a href="<%= url_for('users_create') %>" style="color: #c62;"><%=l 'register' %></a></td>
+                </tr><tr>
+                  <td colspan=2><%= captcha_html %></td>
+                </tr><tr>
+                  <td colspan=2><input type=submit class="alignright"></td>
+                </tr>
+              </table>
+            </form>
+          </div>
+        % }
+          %= content_for 'nav'
         </div>
-        %= content_for 'nav'
       </nav>
+      
+<!--
+    Header
+-->
+      
       <header>
 % if ( content_for 'header' ) {
-        <h1>
-        %= content_for 'header'
-        </h1>
+        <h1><%= content_for 'header' %></h1>
 % }
 % if ( user->data->{ban_reason} ) {
         <div class=info><%=l 'Your account has been blocked.' %>
-            <a href="<%= url_for('auths_logout') %>"><%=l 'logout' %></a></div>
+            <a href="<%= url_for('auths_logout') %>"><%=l 'logout' %></a>
+        </div>
 % }
       </header>
         %= content_for 'body'
