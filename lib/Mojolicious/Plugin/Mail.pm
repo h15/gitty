@@ -24,7 +24,7 @@ sub register {
         
         my $html = $self->render (
             partial    => 1,
-            action     => $type,
+            template   => "mail/$type",
         );
         
         MIME::Lite->new (
