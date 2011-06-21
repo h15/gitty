@@ -13,7 +13,6 @@
 % end
 
 <%= content body => begin %>
-<article class=page>
     <form method=post action="<%= url_for('users_create') %>">
 	    <table class="aligncenter rounded">
 	        <tr>
@@ -21,7 +20,7 @@
 	                <%=l 'e-mail' %>
 	            </td>
 	            <td>
-	                <input name=mail>
+	                <input name=mail class=alignright>
 	            </td>
 	        </tr>
 	        <tr>
@@ -37,5 +36,5 @@
 	            </td>
 	        </tr>
 	    </table>
-</article>
+	</form>
 <% end %>

@@ -1,103 +1,42 @@
 % languages 'ru';
 <!doctype html>
 <html lang=ru>
-  <head>
-    <meta charset=utf-8>
-    %= stylesheet '/css/main.css'
-    %= stylesheet 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js'
-    %= javascript '/js/main.js'
-    <link rel=icon href="/favicon.ico" sizes="32x32" type="image/png">
-    <title>
-      %= content_for 'title'
-    </title>
-  </head>
-  <body>
-    <div class=page>
-      <nav>
-      
-<!--
-    Left combobox container
--->
-        <div class=left-combobox-container>
-          <!-- combobox for index -->
-          <div class="combobox">
-            <a href="/">
-              <div><%=l 'index' %></div>
-            </a>
-          </div>
-          <div class="combobox">
-          <!-- combobox for git -->
-            <div class=active id=git>
-              <a href="<%= url_for('gits_read') %>"><%=l 'Repo' %></a>
-              <div class=alignright><a href="#" onclick="hide('git_combobox');return false;">&nabla;</a></div>
-            </div>
-            <!-- Additional boxes -->
-            <div id=git_combobox>
-              <a href="<%= url_for('gits_new') %>"><div><%=l 'New repo' %></div></a>
-              <a href="<%= url_for('gits_key') %>"><div><%=l 'Add key' %></div></a>
-              <a href="<%= url_for('gits_server_key_form') %>"><div><%=l 'Add server' %></div></a>
-            </div>
-          </div>
-        </div>
-        
-<!--
-    Right combobox container
--->
-        <div class=right-combobox-container>
-        % if ( user->data->{'id'} > 1 ) {
-          <div>
-            <a href="<%= url_for('users_read', id => user->data->{'id'}) %>"><%= user->data->{'name'} %></a>
-            <a href="<%= url_for('auths_logout') %>" class=rounded>x</a>
-          </div>
-        % } else {
-          <div class="alignright">
-            <div class="combobox">
-            <!-- combobox for login -->
-              <a href="<%= url_for('auths_login') %>" onClick="hide('login_combobox');return false;"><div><%=l 'login' %></div></a>
-            </div>
-          </div>
-          <!-- Additional combobox. Login form -->
-          <div style="display:none" id=login_combobox class="aligncenter rounded">
-            <form method=post action="<%= url_for('auths_login') %>">
-              <table>
-                <tr><td><%=l 'e-mail' %></td>
-                  <td><input name=mail></td>
-                </tr><tr>
-                  <td><%=l 'password' %></td>
-                  <td><input type=password name=passwd></td>
-                </tr><tr>
-                  <td colspan=2 style="text-align:center"><a href="<%= url_for('users_create') %>" style="color: #c62;"><%=l 'register' %></a></td>
-                </tr><tr>
-                  <td colspan=2><%= captcha_html %></td>
-                </tr><tr>
-                  <td colspan=2><input type=submit class="alignright"></td>
-                </tr>
-              </table>
-            </form>
-          </div>
-        % }
-          %= content_for 'nav'
-        </div>
-      </nav>
-      
-<!--
-    Header
--->
-      
-      <header>
-% if ( content_for 'header' ) {
-        <h1><%= content_for 'header' %></h1>
-% }
-% if ( user->data->{ban_reason} ) {
-        <div class=info><%=l 'Your account has been blocked.' %>
-            <a href="<%= url_for('auths_logout') %>"><%=l 'logout' %></a>
-        </div>
-% }
-      </header>
-        %= content_for 'body'
-      <footer>
-        %= content_for 'footer'
-      </footer>
-    </div>
-  </body>
+    <head>
+        %= stylesheet '/css/main.css'
+        %= javascript 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js'
+        %= javascript '/js/main.js'
+        <meta charset=utf-8>
+    </head>
+    <body id=body>
+%= include 'hidden_forms'
+        <nav>
+            <select onChange="document.location = this.value">
+                <option selected style="display:none"> Git
+                <option value="<%= url_for('gits_index') %>">          <%=l 'Repos' %>
+                <option value="<%= url_for('gits_new') %>">            <%=l 'New repo' %>
+                <option value="<%= url_for('gits_key_form') %>">       <%=l 'Add key' %>
+                <option value="<%= url_for('gits_server_key_form') %>"><%=l 'Add server' %>
+            </select>
+            
+            <select onChange="this.value[0] == '/' ? document.location = this.value : hide(this.value);" class=alignright>
+                <option selected style="display:none"> <%= user->name %>
+            % if ( user->id != 1 ) {
+                <option value="<%= url_for('users_read', id => user->id) %>"> <%=l 'Profile' %>
+                <option value="<%= url_for('auths_logout') %>">               <%=l 'Logout' %>
+            % } else {
+                <option value="login_form">                                   <%=l 'Login' %>
+                <option value="login_via_mail">                               <%=l 'Login via mail' %>
+                <option value="register_form">                                <%=l 'Register' %>
+            % }
+            </select>
+        </nav>
+        <header>
+            <h1>
+%= content_for 'header'
+            </h1>
+        </header>
+        <article class=page>
+%= content_for 'body'
+        </article>
+    </body>
 </html>

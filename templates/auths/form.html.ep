@@ -13,7 +13,6 @@
 % end
 
 %= content body => begin
-<article class=page>
     <form method=post action="<%= url_for('auths_login') %>">
 	    <table class="aligncenter rounded">
 	        <tr>
@@ -46,5 +45,4 @@
 	        </tr>
 	    </table>
     </form>
-</article>
 % end

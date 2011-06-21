@@ -1,17 +1,18 @@
 package Mojolicious::Plugin::User;
+
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Digest::MD5 "md5_hex";
-use Mojolicious::Plugin::User::User;
+use Model::User::User;
 
-our $VERSION = 0.2;
+our $VERSION = 0.3;
 
 sub register {
     my ( $self, $app, $conf ) = @_;
     
     $app->fatal('Config must be defined.') unless defined %$conf;
     
-    my $user = new Mojolicious::Plugin::User::User;
+    my $user = new Model::User::User;
     
     $app->secret( $conf->{cookies} );
     $app->sessions->default_expiration( 3600 * 24 * $conf->{confirm} );
@@ -25,16 +26,16 @@ sub register {
         # Anonymous has 1st id.
         $id ||= 1;
         
-        $user->update( $self->data->read_one(users => {id => $id}) );
+        $user = Model::User::User->new( id => $id )->load;
         
         unless ( $user->is_active ) {
-            my $ban = $user->data->{ban_reason};
-            $user->update( $self->data->read_one(users => {id => 1}) );
-            $user->data->{ban_reason} = $ban;
+            my $ban = $user->ban_reason;
+            $user = Model::User::User->new( id => 1 )->load;
+            $user->ban_reason($ban);
         }
     });
     
-    $app->helper(user => sub { $user });
+    $app->helper( user => sub { $user } );
     
     $app->stash( salt => $conf->{salt} );
     
@@ -62,12 +63,12 @@ sub register {
         render_user => sub {
             my ( $self, $id ) = @_;
             
-            my $user = $self->data->read_one(users => {id => $id});
+            my $user = Model::User::User->new( id => $id );
             
             return new Mojo::ByteStream (
-                '<a href="' . $app->url_for('users_read', id => $id) . '" class="' .
-                    ($user->{ban_reason} ? 'banned' : 'active') . '">' .
-                    $user->{name} . "</a>"
+                '<a href="' . $app->url_for( 'users_read', id => $id ) . '" class="' .
+                    ($user->ban_reason ? 'banned' : 'active') .
+                '">' . $user->name . "</a>"
             );
         }
     );

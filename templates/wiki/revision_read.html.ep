@@ -1,0 +1,46 @@
+% extends 'base';
+
+% content_for header => begin
+    <%= $page->{title} %>
+% end
+
+% content body => begin
+
+<div class=info>
+%= l('You are watching') . " " . $self->param('rid') . " "  . l('revision') . "."
+
+% if ( $page->{cur_rev} != $self->param('rid') ) {
+    %=  l('But current revision is') . " " . $page->{cur_rev} . "."
+    
+    <form style="display:inline" action="<%= url_for('wiki_revision_update', aid => $self->param('aid'), rid => $self->param('rid') ) %>" method=post>
+        <input type=submit value="<%=l 'activate' %>">
+    </form>
+% }
+% else {
+    %=l "This is a current revision."
+% }
+</div>
+
+<pre>
+%= $page->{text}
+</pre>
+
+<a href="#" onClick="hide('update_fields'); return false;"><%=l 'change' %></a>
+<div id=update_fields class=hidden>
+    <form action="<%= url_for( 'wiki_article_update', aid => $self->param('aid') ) %>" method=post class="rounded">
+        <input class=wide name=title value="<%= $page->{title} %>">
+        <textarea class=wide name=text><%= $page->{text} %></textarea>
+        
+        <div style="padding:10px 0px 20px 0px">
+            <div class=alignright>
+                <select name=status>
+                    <option value=0><%=l 'Open' %>
+                    <option value=1><%=l 'Close' %>
+                </select>
+                <input type=submit>
+            </div>
+        </div>
+    </form>
+</div>
+
+% end

@@ -1,25 +1,26 @@
 % extends 'base';
 % content_for title => begin
-    <%=l "Create new repo" %>
+    <%=l "Your public key" %>
 % end
 
 % content_for nav => begin
 % end
 
 % content_for header => begin
-    <%=l "Create new repo" %>
+    <%=l "Your public key" %>
 % end
 
 % content_for footer => begin
 % end
 
 <%= content body => begin %>
-<article class=page>
     <form method=post action="<%= url_for('gits_key') %>">
 	    <div class="aligncenter rounded">
             <%=l 'Your public key' %>
             <textarea name=key class=wide></textarea>
-            <input type=submit class="alignright">
+            <div style="padding:10px 0px 20px 0px">
+                <input type=submit class="alignright">
+            </div>
 	    </div>
-</article>
+	</form>
 <% end %>

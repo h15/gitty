@@ -4,70 +4,40 @@ use Mojo::Base 'Mojolicious';
 # This method will run once at server start
 sub startup {
     my $app = shift;
-    
-    # Plugins
+
     $app->plugin('i18n');
     $app->plugin('message');
     $app->plugin('captcha');
-    
-    #
-    #   Config is here
-    #
-    $app->plugin( sql => {
-        host    => 'dbi:mysql:gitty',
-        user    => 'gitty',
-        passwd  => 'gitty',
-        prefix  => 'gitty__',
-    });
     $app->plugin( user => {
         cookies => 'some random string',    # random string for cookie salt;
         confirm => 7,                       # time to live of session in days;
         salt    => 'some random string',    # random string for db salt;
     });
-    $app->plugin( mail => {
-        site => 'http://lorcode.org:3000/',
-        from => 'no-reply@lorcode.org'
-    });
     $app->plugin( gitosis => {
-        git_home => '/home/h15/gitosis/gitosis-admin/'
+        git_home => '/home/h15/gitorepo/gitosis-admin/',
     });
-    #
-    #   End of config
-    #
-    
+
     # Routes
-    my $r = $app->routes;
-    $r->route('/')->via('get')->to(cb => sub { shift->render( template => 'info/index' ) })->name('index');
+    my $r = $app->routes;#->bridge('/')->to( 'auths#check', level => 'admin' );
+       $r->namespace('Controller');
     
-    # Help info
-    $r = $app->routes->route('/help/git');
-    $r->route('/install_gitosis')->via('get')
-        ->to(cb => sub { shift->render( template => 'info/git/install_gitosis' ) })->name('install_gitosis');
-    $r->route('/init')->via('get')->to(cb => sub { shift->render( template => 'info/git/init' ) })
-        ->name('git_init');
+    #
+    #$r->route('/help/')->via('get')->to('helps#list');
+    #$r->route('/help/:id')->via('get')->to('helps#read');
     
-    # Helpers
-    $app->helper (
-    	# Recursive build html tables for config structure.
-        html_hash_tree => sub {
-            my ( $self, $config, $parent ) = @_;
-            my $ret = '';
-            $parent ||= '';
-            $config = {} unless defined %$config;
-            
-            for my $k ( keys %$config ) {
-                $ret .= "<tr><td>$k</td><td name='$parent-$k'>";
-                
-                # Branch or leaf?
-                $ret .= ( ref $config->{$k} ?
-                    $self->html_hash_tree( $config->{$k}, "$parent-$k" ) :
-                    "<input value='" . $config->{$k} . "' name='$parent-$k-input'>"
-                );
-                $ret .= "</td></tr>";
-            }
-            return "<table>$ret</table>";
-        }
-    );
+    #= Wiki
+    my $w = $r->route('/wiki');
+    #== articles
+    $w->route( '/new'                      )->via('get' )->to('wiki#article_form'  )->name('wiki_article_form'  );
+    $w->route( '/new'                      )->via('post')->to('wiki#article_create')->name('wiki_article_create');
+    $w->route( '/:aid'    , aid => qr/\d+/ )->via('get' )->to('wiki#article_read'  )->name('wiki_article_read'  );
+    $w->route( '/:aid'    , aid => qr/\d+/ )->via('post')->to('wiki#article_update')->name('wiki_article_update');
+    $w->route( '/:aid/del', aid => qr/\d+/ )->via('post')->to('wiki#article_delete')->name('wiki_article_delete');
+    
+    #== revisions
+    $w->route( '/:aid/:rid'    , aid => qr/\d+/, rid => qr/\d+/ )->via('get' )->to('wiki#revision_read'  )->name('wiki_revision_read'  );
+    $w->route( '/:aid/:rid'    , aid => qr/\d+/, rid => qr/\d+/ )->via('post')->to('wiki#revision_update')->name('wiki_revision_update');
+    $w->route( '/:aid/:rid/del', aid => qr/\d+/, rid => qr/\d+/ )->via('post')->to('wiki#revision_delete')->name('wiki_revision_delete');
     
     $app->helper (
         is => sub {
@@ -142,6 +112,7 @@ use Encode 'decode';
 our %Lexicon = (
     _AUTO => 1,
     'Repo'          => 'Репозиторий',
+    'Repos'         => 'Репозитории',
     'New repo'      => 'Создать новый',
     'Add key'       => 'Добавить ключ',
     'name'          => 'имя',
@@ -150,7 +121,7 @@ our %Lexicon = (
     'password'      => 'пароль',
     'repeat'        => 'повторить',
     'registered'    => 'зарегистрирован',
-    'register'      => 'зарегистрировать',
+    'Register'      => 'Регистрирация',
     'ban reason'    => 'причина блокировки',
     'ban time'      => 'время блокировки',
     'now'           => 'сейчас',
@@ -161,6 +132,15 @@ our %Lexicon = (
     'week'          => 'неделя',
     'day'           => 'день',
     'hour'          => 'час',
+   
+    'description'   => 'описание',
+   
+    'ban options'   => 'блокировка',
+    
+    'Profile'       => 'Профиль',
+    'Login'         => 'Войти',
+    'Login via mail'=> 'Войти с почты',
+    'Logout'        => 'Выйти',
     
     'Add server'    => 'Добавить сервер',
     

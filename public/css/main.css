@@ -7,21 +7,70 @@
  * the terms of the Artistic License version 2.0.
  */
 
+html {
+  padding:0px;
+  margin:0px;
+  height: 80%;
+  /* Gradient */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#5699A9', endColorstr='#ffffff'); /* for IE */
+  background: -webkit-gradient(linear, left top, left bottom, from(#5699A9), to(#ffffff)); /* for webkit browsers */
+  background: -moz-linear-gradient(top,  #5699A9,  #ffffff); /* for firefox 3.6+ */
+  background-repeat: no-repeat;
+}
 body {
   padding:0px;
   margin:0px;
+  height:120%;
+  width:100%;
   font-family: Sans-Serif,'Lucida Grande';
   color:#444;
   font-size: 14px;
+  background: url('/img/mojolicious-clouds.png') no-repeat 0% 0%;
 }
 a { color: #c62; }
 img { border:0px; }
+h1,h2,h3,h4,h5,h6 {
+    padding-top:0px;
+    margin-top:0px;
+}
+body nav select {    
+    font-size:14px;
+    margin-left:10px;
+}
+
+body nav select.alignright {
+    margin-right:10px;
+}
+
+
+pre {
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
 
 /**********************
 * For HTML5 slowpokes *
 **********************/
 
 nav, header, article, footer { display: block; }
+
+/*** forms ***/
+
+.popup {
+    position:absolute;
+    right:10px;
+    top:30px;
+}
+
+.close {
+    position:absolute;
+    top:-10px;
+    right:240px;
+    width:20px;
+}
 
 /*** navigation ***/
 
@@ -54,75 +103,9 @@ nav div {
     padding:0px;
 }
 
-/*** Comboboxes ***/
-
-.combobox-container {
-  float:left;
-	position:absolute;
-	left:10px;
-	top:3px;
-	display:inline;
-}
-
-.right-combobox-container div {
-  margin-right:10px;
-}
-
-.combobox {
-  margin-left:10px;
-  padding:1px 0px 1px 0px;
-  width:150px;
-  float:left;
-/*	background:#d4cec7;  */
-  border:#a49e97 solid 1px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	-khtml-border-radius: 5px;
-	  /* Gradient */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F3F0ED', endColorstr='#b4aea7'); /* for IE */
-  background: -webkit-gradient(linear, left top, left bottom, from(#F3F0ED), to(#b4aea7)); /* for webkit browsers */
-  background: -moz-linear-gradient(top,  #f3f0ed,  #b4aea7); /* for firefox 3.6+ */
-}
-
-.combobox:hover {
-	background:#f3f0ed;
-  border:#b4aea7 solid 1px;
-	/* Gradient */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F3F0ED', endColorstr='#d4cec7'); /* for IE */
-  background: -webkit-gradient(linear, left top, left bottom, from(#F3F0ED), to(#d4cec7)); /* for webkit browsers */
-  background: -moz-linear-gradient(top,  #f3f0ed,  #d4cec7); /* for firefox 3.6+ */
-}
-
-.combobox .unpressed {
-/*	background:#f3f0ed;
-  border:#b4aea7 solid 1px; */
-}
-
-.combobox div {
-    padding:0px 5px 0px 5px;
-    margin:0px;
-}
-
-#git_combobox div {
-/*    border-top:1px solid #aaa;*/
-    margin:2px 0px 0px 0px;
-    padding:4px 0px 2px 0px;
-}
-
-#git_combobox {
-    display:none;
-}
-
-.combobox #git {
-    display:inline;
-}
-
-#login_combobox {
-  position:absolute;
-  right:10px;
-  top:23px;
-  border:#a49e97 solid 1px;
+body header {
+    width:600px;
+    margin:30px auto;
 }
 
 /*** Threads ***/
@@ -147,13 +130,18 @@ nav div {
 }
 
 .user_fields {
-    width:300px;
+    width:360px;
+}
+
+.user_fields .fields {
+    width:200px;
 }
 
 /*** Messages ***/
 
 .done, .error, .info, .rounded {
-	padding: 5px;
+	padding: 10px;
+	padding-right: 15px;
 	background:#F2F1F0;
 	border: 1px solid #ddd;
 	-moz-border-radius: 5px;
@@ -164,7 +152,7 @@ nav div {
 
 .done, .error, .info {
     text-align:center;
-	margin: 5px;
+	margin: 0px;
 }
 
 .info {
@@ -175,20 +163,27 @@ nav div {
 .error {
     background: #fee;
     border: 1px solid #fcc;
-    margin: 50px auto;
+    margin: 0px auto;
 }
 
 .done {
     background: #efe;
     border: 1px solid #cfc;
-    margin: 50px auto;
+}
+
+.hidden {
+    display:none;
 }
 
 /***************************/
 
 .wide {
     display:block;
-    width:580px;
+    width:100%;
+}
+
+.captcha input {
+    width:210px;
 }
 
 /*** wiki ***/
@@ -202,12 +197,7 @@ nav div {
 }
 
 .wiki textarea.text {
-    height:400px;
-}
-
-
-header {
-    margin-top:50px;
+    height:100%;
 }
 
 .small {
@@ -221,8 +211,7 @@ header {
 }
 
 body header h1 {
-    color:#bbb;
-    border-bottom:3px solid #ddd;
+    color:#fff;
 }
 
 footer {
@@ -232,19 +221,24 @@ footer {
     padding:5px;
 }
 
-article.page {
-	margin:0px auto;
-}
-
 article.page td {
     padding: 5px;
 }
 
-.page {
-	margin:0px auto;
+article.page {
+	margin:10px auto;
+	padding:10px 10px 0px 10px;
 	width:600px;
+	height:100%;
 	color:#222;
 	font-family:Sans, Arial;
+	background:#fff;
+	
+	border: 1px solid #fff;
+	-moz-border-radius:10px 10px 0px 0px;
+	-webkit-border-radius:10px 10px 0px 0px;
+	border-radius:10px 10px 0px 0px;
+	-khtml-border-radius:10px 10px 0px 0px;
 }
 
 td.changeable {

@@ -14,7 +14,6 @@
 % end
 
 <%= content body => begin %>
-<article class=page>
     <form method=post action="<%= url_for('gits_create') %>">
 	    <div class="aligncenter rounded">
             <%=l 'name' %>
@@ -26,5 +25,5 @@
             <%= captcha_html %>
             <input type=submit class="alignright">
 	    </div>
-</article>
+	</form>
 <% end %>

@@ -1,32 +1,26 @@
 % extends 'base';
-% content_for title => begin
-    <%=l 'Repo' %> <%= $name %>
-% end
-
-% content_for nav => begin
-% end
 
 % content_for header => begin
     <%=l 'Repo' %> <%= $name %>
 % end
 
-% content_for footer => begin
-% end
-
 %= content body => begin
-<article class="page">
 
-% if ( 'u'.user->data->{id} eq $members->[0] || user->is_admin ) {
-<form method=post action="<%= url_for('gits_update', repo => $name) %>">
+% if ( 'u'.user->id eq $members->[0] || user->is_admin ) {
+<form method=post action="<%= url_for('gits_update', repo => $name) %>" class="rounded">
+    <%=l 'name' %>
     <input name=name value="<%= $name %>" class=wide>
+    <div style="margin-top:10px"><%=l 'description' %></div>
     <textarea name=desc class=wide><%= $desc %></textarea>
+    <div style="margin-top:10px"><%=l 'members' %></div>
     <textarea name=members class=wide><%= join ' ', @$members %></textarea>
     <input type=submit>
 </form>
 % } else {
-    <div><%= $desc %></div>
-    <div><%= join ' ', @$members %></div>
+    <%=l 'description' %>
+    <div class="rounded"><%= $desc %></div>
+    <div style="margin-top:10px"><%=l 'members' %></div>
+    <div class="rounded"><%= join ' ', @$members %></div>
 % }
 
-</article>
 % end

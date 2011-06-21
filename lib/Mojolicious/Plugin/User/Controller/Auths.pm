@@ -1,5 +1,8 @@
 package Mojolicious::Plugin::User::Controller::Auths;
+
 use Mojo::Base 'Mojolicious::Controller';
+
+use Model::User::User;
 
 sub login {
 	my $self = shift;
@@ -9,25 +12,25 @@ sub login {
 	# It's not an e-mail!
 	$self->IS( mail => $self->param('mail')	);
 	
-	# Get accounts by e-mail.
-	my $user = $self->data->read_one( users => { mail => $self->param('mail') } );
-    
-    # If this e-mail does not exist
-    # or more than one account has this e-mail.
-    return $self->error("This pair(e-mail and password) doesn't exist!") unless defined %$user;
+	# Does it exist?
+	unless ( Model::User::User->new( mail => $self->param('mail') )->load(speculative => 1) ) {
+	    return $self->error("This pair(e-mail and password) doesn't exist!");
+	}
+	
+	my $user = Model::User::User->new( mail => $self->param('mail') )->load;
     
     # Password test:
     #   hash != md5( regdate + password + salt )
-    my $s = $user->{regdate} . $self->param('passwd') . $self->stash('salt');
+    my $s = $user->regdate . $self->param('passwd') . $self->stash('salt');
     
-    if ( $user->{password} ne Digest::MD5::md5_hex($s) ) {
+    if ( $user->password ne Digest::MD5::md5_hex($s) ) {
         return $self->error( "This pair(e-mail and password) doesn't exist!" );
     }
     
     # Init session.
     $self->session (
-        user_id  => $user->{id},
-    )->redirect_to( 'users_read', id => $user->{id} );
+        user_id  => $user->id,
+    )->redirect_to( 'users_read', id => $user->id );
 }
 
 sub logout {
@@ -41,11 +44,10 @@ sub mail_request {
     
 	$self->IS( mail => $self->param('mail') );
 	
-    # Get accounts by e-mail.
-	my $user = $self->data->read_one( users => {mail => $self->param('mail')} );
-    
-    # if 0 - all fine
-    return $self->error( "This e-mail doesn't exist in data base!" ) unless defined %$user;
+	# Does it exist?
+	if ( Model::User::User->new( mail => $self->param('mail') )->load(speculative => 1) ) {
+	    return $self->error( "This e-mail doesn't exist in data base!" );
+	}
     
     # Generate and save confirm key.
     my $confirm_key = Digest::MD5::md5_hex(rand);
@@ -72,35 +74,36 @@ sub mail_confirm {
     my $self = shift;
     my $mail = $self->param('mail');
     
-    my $user = $self->data->read_one( users => {
-        mail => $mail,
-        confirm_key => $self->param('key')
-    });
-    
-    # This pair does not exist.
-    return $self->error('Auth failed!') unless defined %$user;
+	# Does it exist?
+	unless ( Model::User::User->new( mail => $self->param('mail') )->load(speculative => 1) ) {
+	    return $self->error('Auth failed!');
+	}
+	
+	my $user = Model::User::User->new( mail => $mail )->load;
     
     my $cfg = $self->stash('user');
     
+    if ( $user->confirm_key eq '' ) {
+        return $self->error('You did not request mail login!');
+    }
     # Too late
-    if ( $user->{confirm_time} > time + 86400 * $cfg->{confirm} ) {
-        $self->data->update( users =>
-            { confirm_key => '', confirm_time => 0 },
-            { mail => $mail }
-        );
+    if ( $user->confirm_time > time + 86400 ) {
+        $user->delete;
         return $self->error('Auth failed (too late)!');
     }
+    # Wrong confirm key
+    if ( $user->confirm_key ne $self->param('key') ) {
+        $user->delete;
+        return $self->error('Auth failed!');
+    }
     
-    $self->data->update( users =>
-        { confirm_key => '', confirm_time => 0 },
-        { mail => $mail }
-    );
-    
-    my $user = $self->data->read_one(users => {mail => $mail});
+    $user->confirm_key('');
+    $user->confirm_time(0);
+    $user->mail($mail);
     
     $self->session (
-        user_id  => $user->{id},
-    )->redirect_to( 'users_read', id => $user->{id} );
+        user_id  => $user->id,
+    )->redirect_to( 'users_read', id => $user->id );
 }
 
 1;

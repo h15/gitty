@@ -13,7 +13,6 @@
 % end
 
 %= content body => begin
-<div class=page>
     <form method=post action="<%= url_for('auths_mail_request') %>">
 	    <table class="aligncenter rounded">
 	        <tr>
@@ -37,5 +36,5 @@
 	            </td>
 	        </tr>
 	    </table>
-</div>
+	</form>
 % end

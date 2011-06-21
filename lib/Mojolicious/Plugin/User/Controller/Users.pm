@@ -1,29 +1,32 @@
 package Mojolicious::Plugin::User::Controller::Users;
+
 use Mojo::Base 'Mojolicious::Controller';
+
+use Model::User::User;
 
 sub read {
     my $self = shift;
     
-	# Get accounts by id.
-	my $user = $self->data->read_one( users => { id => $self->stash('id') } );
+	# Does it exist?
+	unless ( Model::User::User->new( id => $self->stash('id') )->load(speculative => 1) ) {
+	    return $self->error("User with this id doesn't exist!");
+	}
+
+	my $user = Model::User::User->new( id => $self->stash('id') )->load;
     
-    return $self->error("User with this id doesn't exist!") unless defined %$user;
-    
-    if ( $self->user->data->{id} != 1                         # not Anonymous
-        && ( $self->param('id') == $self->user->data->{id}    # and Self
-             || $self->user->is_admin()                       #  or Admin.
-        ) ) {
+    if ( $self->user->id != 1                         # not Anonymous
+        && ( $self->param('id') == $self->user->id    # and Self
+             || $self->user->is_admin ) ) {         #  or Admin.
         $self->read_extended($user);
     }
     else {
-        $self->stash(user => $user);
+        $self->stash( user => $user );
         $self->render;
     }
 }
 
 sub read_extended {
     my ( $self, $user ) = @_;
-    
     $self->stash( user => $user );
     $self->render( action => 'read_extended' );
 }
@@ -33,29 +36,27 @@ sub create {
     
     return $self->error('CAPTCHA test failed.') unless $self->captcha;
     
+    # Does it exist?
+	if ( Model::User::User->new(mail => $self->param('mail'))->load(speculative => 1) ) {
+	    return $self->error("User with this id already exists!");
+	}
+    
     my $key = Digest::MD5::md5_hex(rand);
     
-    my $user = $self->data->read_one( users => {mail => $self->param('mail')} );
+#    $self->mail( confirm =>
+#        $self->param('mail'),
+#        'Registration',
+#        { key  => $key, mail => $self->param('mail') }
+#    );
     
-    return $self->redirect_to('users_form') if defined %$user;
-    
-    $self->mail( confirm =>
-        $self->param('mail'),
-        'Registration',
-        {
-            key  => $key,
-            mail => $self->param('mail')
-        }
+    my $user = Model::User::User->new (
+        mail         => $self->param('mail'),
+        regdate      => time,
+        confirm_time => time + 86400,               # Day for activate
+        confirm_key  => $key,
+        groups       => '1000',                     # Weakest group
     );
-    
-    my $cfg = $self->stash('user');
-    
-    $self->data->create( users => {
-        mail    => $self->param('mail'),
-        regdate => time,
-        confirm_time => time + 86400 * $cfg->{confirm},
-        confirm_key  => $key
-    });
+    $user->save;
     
     return $self->done('Check your mail.');
 }
@@ -63,35 +64,26 @@ sub create {
 sub update {
     my $self = shift;
     
-	# Get accounts by id.
-	my $user = $self->data->read_one( users => {id => $self->stash('id')} );
-	
-    return $self->error("User with this id doesn't exist!") unless defined %$user;
-    
-    unless ( $self->user->data->{id} != 1
-        && ( $self->param('id') == $self->user->data->{id}
-            || $self->user->is_admin()
-        ) ) {
-        return $self->error("Permission denied!")
+    # Can change?
+    unless ( $self->user->id != 1
+            && ( $self->param('id') == $self->user->id
+                || $self->user->is_admin ) ) {
+        return $self->error("Permission denied!");
     }
     
-    # Parse query.
-    my %q;
+    # Does it exist?
+	unless ( Model::User::User->new(id => $self->param('id'))->load(speculative => 1) ) {
+	    return $self->error("User with this id doesn't exist!");
+	}
     
-    %q = ( %q, name => $self->param('name') ) if defined $self->param('name') && ! defined $user->{'name'};
-    %q = ( %q, mail => $self->param('mail') ) if defined $self->param('mail');
-    %q = ( %q, ban_time   => $self->param('ban_time') )   if defined $self->param('ban_time');
-    %q = ( %q, ban_reason => $self->param('ban_reason') ) if defined $self->param('ban_reason');
-    
-    if ( defined $self->param('pass') && $self->param('pass') eq $self->param('pass2') ) {
-        my $s = $user->{regdate} . $self->param('pass') . $self->stash('salt');
-        %q = ( %q, password => Digest::MD5::md5_hex($s) )
-    }
-    
-    $self->data->update( users =>
-        \%q,
-        { id => $self->stash('id') }
-    );
+    my $user = Model::User::User->new( id => $self->param('id') )->load;
+       $user->name      ( $self->param('name'      ) ) if defined $self->param('name') && ! defined $user->name;
+       $user->mail      ( $self->param('mail'      ) ) if defined $self->param('mail');
+       $user->ban_time  ( $self->param('ban_time'  ) ) if defined $self->param('ban_time');
+       $user->ban_reason( $self->param('ban_reason') ) if defined $self->param('ban_reason');
+       $user->password  ( Digest::MD5::md5_hex( $user->regdate . $self->param('pass') . $self->stash('salt') ) )
+                                                       if defined $self->param('pass') && $self->param('pass') eq $self->param('pass2');
+       $user->save;
     
     $self->redirect_to( 'users_read', id => $self->stash('id') );
 }

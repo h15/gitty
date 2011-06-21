@@ -15,10 +15,10 @@
 
 % content_for body => begin
     <div class=info>
-        <a href="<%= url_for('git_init') %>"><%=l 'How to create new repository' %></a>
+        <a href="<%= url_for('wiki_article_read', aid => 2) %>"><%=l 'How to create new repository' %></a>
     </div>
-    <div style="height:30px;">
-        <a href="<%= url_for('gits_new') %>"><div class="alignright rounded"><%=l 'New repo' %></div></a>
+    <div style="padding:10px 0px 20px 0px; display:block">
+        <input type=button class=alignright onClick="document.location = '<%= url_for('gits_new') %>'" value="<%=l 'New repo' %>">
     </div>
     <article class="plugins">
 %   for my $r (@$repos) {

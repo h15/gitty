@@ -14,12 +14,12 @@
 % end
 
 <%= content body => begin %>
-<article class=page>
     <form method=post action="<%= url_for('gits_server_key') %>">
 	    <div class="aligncenter rounded">
             <%=l 'Add server public key' %>
             <textarea name=key class=wide></textarea>
-            <input type=submit class="alignright">
+            <div style="padding:10px 0px 20px 0px">
+                <input type=submit class="alignright">
+            </div>
 	    </div>
-</article>
 <% end %>

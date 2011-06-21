@@ -1,0 +1,86 @@
+% my $captcha = captcha_html;
+<form method=post action="<%= url_for('auths_login') %>" id=login_form class="hidden popup">
+    <a href="#" onClick="hide();return false;" class=close><img src="/img/close.png" alt='x'></a>
+    <table class="aligncenter rounded">
+        <tr>
+            <td>
+                <%=l 'e-mail' %>
+            </td>
+            <td>
+                <input name=mail class=alignright>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <%=l 'password' %>
+            </td>
+            <td>
+                <input type=password name=passwd>
+            </td>
+        </tr>
+        <tr>
+            <td colspan=2 class=captcha>
+                <%= $captcha %>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                <input type=submit class="alignright" value="<%=l 'Login' %>">
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form method=post action="<%= url_for('auths_mail_request') %>" id=login_via_mail class="hidden popup">
+    <a href="#" onClick="hide();return false;" class=close><img src="/img/close.png" alt='x'></a>
+    <table class="aligncenter rounded">
+        <tr>
+            <td>
+                <%=l 'e-mail' %>
+            </td>
+            <td>
+                <input name=mail class=alignright>
+            </td>
+        </tr>
+        <tr>
+            <td colspan=2 class=captcha>
+                <%= $captcha %>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                <input type=submit value="<%=l 'Login' %>" class="alignright">
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form method=post action="<%= url_for('users_create') %>" id=register_form class="hidden popup">
+    <a href="#" onClick="hide();return false;" class=close><img src="/img/close.png" alt='x'></a>
+    <table class="aligncenter rounded">
+        <tr>
+            <td>
+                <%=l 'e-mail' %>
+            </td>
+            <td>
+                <input name=mail class=alignright>
+            </td>
+        </tr>
+        <tr>
+            <td colspan=2 class=captcha>
+                <%= $captcha %>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                <input type=submit class="alignright">
+            </td>
+        </tr>
+    </table>
+</form>

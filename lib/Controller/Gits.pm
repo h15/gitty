@@ -1,19 +1,20 @@
-package Mojolicious::Plugin::Gitosis::Controller::Gits;
+package Controller::Gits;
 use Mojo::Base 'Mojolicious::Controller';
 
 sub create_repo {
     my $self = shift;
     
     return $self->error('Must be logged in')    unless $self->user->is_active;
+    
     return $self->error('Wrong name format')    if $self->param('name')    !~ $self->gitosis->{word};
     return $self->error('Wrong members format') if $self->param('members') !~ m/(?:\s*\d+\s*)*/;
     return $self->error('Wrong desc format')    if $self->param('desc')    !~ $self->gitosis->{list};
     return $self->error('Already exists')       if $self->gitosis->find_group( $self->param('name') );
     
     my @members = split /\s+/, $self->param('members');
-    unshift @members, 'u' . $self->user->id unless grep {$_ == 'u' . $self->user->id} @members;
+    unshift @members, $self->user->data->{id} unless grep {$_ == $self->user->data->{id}} @members;
     
-    @members = map { $_ =~ /^u/i ? $_ : "u$_" } @members;
+    @members = map { "u$_" } @members;
     
     $self->gitosis->add_group ({
         $self->param('name') => {
@@ -72,7 +73,7 @@ sub update {
     return $self->error('Repo does not exist') unless defined %$group;
     
     my @members = split /\s+/, $self->param('members');
-    return $self->error('You are not owner') if 'u'.$self->user->id ne $members[0];
+    return $self->error('You are not owner') if 'u'.$self->user->data->{id} ne $members[0];
     
     if ( $repo ) {
         $repo->{desc} = $self->param('desc');
@@ -97,7 +98,7 @@ sub add_key {
     
     return $self->error('Must be logged in') unless $self->user->is_active;
     
-    open F, '>', $self->stash('dir') . 'keydir/u' . $self->user->id . '.pub';
+    open F, '>', $self->stash('dir') . 'keydir/u' . $self->user->data->{id} . '.pub';
     print F $self->param('key');
     close F;
     
@@ -109,7 +110,7 @@ sub add_server_key {
     
     return $self->error('Must be logged in') unless $self->user->is_active;
     
-    open F, '>', $self->stash('dir') . 'keydir/s' . $self->user->id . '.pub';
+    open F, '>', $self->stash('dir') . 'keydir/s' . $self->user->data->{id} . '.pub';
     print F $self->param('key');
     close F;
     

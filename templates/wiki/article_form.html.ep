@@ -1,0 +1,24 @@
+% extends 'base';
+
+% content_for header => begin
+    <%=l 'Add page' %>
+% end
+
+% content body => begin
+
+<form action="<%= url_for('wiki_article_create') %>" method=post class="rounded">
+    <input name=title class=wide>
+    <textarea class=wide name=text></textarea>
+    
+    <div style="padding:10px 0px 20px 0px">
+        <div class=alignright>
+            <select name=status>
+                <option value=0><%=l 'Open' %>
+                <option value=1><%=l 'Close' %>
+            </select>
+            <input type=submit>
+        </div>
+    </div>
+</form>
+
+% end
