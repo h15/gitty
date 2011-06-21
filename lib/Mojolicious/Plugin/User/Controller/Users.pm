@@ -43,11 +43,11 @@ sub create {
     
     my $key = Digest::MD5::md5_hex(rand);
     
-#    $self->mail( confirm =>
-#        $self->param('mail'),
-#        'Registration',
-#        { key  => $key, mail => $self->param('mail') }
-#    );
+    $self->mail( confirm =>
+        $self->param('mail'),
+        'Registration',
+        { key  => $key, mail => $self->param('mail') }
+    );
     
     my $user = Model::User::User->new (
         mail         => $self->param('mail'),

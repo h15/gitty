@@ -45,29 +45,25 @@ sub mail_request {
 	$self->IS( mail => $self->param('mail') );
 	
 	# Does it exist?
-	if ( Model::User::User->new( mail => $self->param('mail') )->load(speculative => 1) ) {
+	unless ( Model::User::User->new( mail => $self->param('mail') )->load(speculative => 1) ) {
 	    return $self->error( "This e-mail doesn't exist in data base!" );
 	}
-    
-    # Generate and save confirm key.
-    my $confirm_key = Digest::MD5::md5_hex(rand);
-    
-    my $cfg = $self->stash('user');
-    
-    $self->data->update( users =>
-        {
-            confirm_key  => $confirm_key,
-            confirm_time => time + 86400 * $cfg->{confirm}
-        },
-        { mail => $self->param('mail') }
-    );
+	
+	my $confirm_key = Digest::MD5::md5_hex(rand);
+	
+	my $user = Model::User::User->new( mail => $self->param('mail') )->load;
+       $user->confirm_key($confirm_key);
+       $user->confirm_time( time + 86400 );
+       $user->save;
     
     # Send mail
-    $self->mail->confirm ({
-        reason  => 'Change password',
-        mail    => $self->param('mail'),
-        key     => $confirm_key
-    }); 
+    $self->mail( confirm =>
+        $self->param('mail'),
+        'Change password',
+        { key  => $confirm_key, mail => $self->param('mail') }
+    );
+    
+    return $self->done('Check your mail.');
 }
 
 sub mail_confirm {
@@ -100,6 +96,7 @@ sub mail_confirm {
     $user->confirm_key('');
     $user->confirm_time(0);
     $user->mail($mail);
+    $user->save;
     
     $self->session (
         user_id  => $user->id,

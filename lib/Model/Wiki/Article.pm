@@ -37,7 +37,7 @@ __END__
         UNIQUE (
             `title`
         )
-    ) ENGINE = MYISAM
+    ) ENGINE = MYISAM;
 
 =head1 COPYRIGHT AND LICENSE
 
