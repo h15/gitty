@@ -7,37 +7,63 @@ sub startup {
 
     $app->plugin('i18n');
     $app->plugin('message');
+    
+    $app->plugin (
+        'mojo_m' => {
+            driver   => 'mysql',
+            database => 'gitty',
+            host     => 'localhost',
+            username => 'gitty',
+            password => 'gitty',
+        }
+    );
+    
+    $app->model('User')->init (
+        table      => 'users',
+        columns    => [
+            id           => { type => 'serial' , not_null => 1 },
+            groups       => { type => 'text'   , not_null => 1 },
+            regdate      => { type => 'integer', not_null => 1 },
+            name         => { type => 'varchar', length => 32 },
+            mail         => { type => 'varchar', not_null => 1, length => 64 },
+            password     => { type => 'varchar', not_null => 1, default => 0, length => 32 },
+            ban_reason   => { type => 'integer', not_null => 1, default => 0 },
+            ban_time     => { type => 'integer', not_null => 1, default => 0 },
+            confirm_key  => { type => 'varchar', not_null => 1, length => 32 },
+            confirm_time => { type => 'integer', not_null => 1, length => 32 },
+        ],
+        pk_columns => 'id'  ,
+        unique_key => 'mail',
+        unique_key => 'name',
+    );
+    
     $app->plugin('captcha');
+    
     $app->plugin( user => {
         cookies => 'some random string',    # random string for cookie salt;
         confirm => 7,                       # time to live of session in days;
         salt    => 'some random string',    # random string for db salt;
     });
+    
     $app->plugin( gitosis => {
         git_home => '/home/h15/gitorepo/gitosis-admin/',
     });
 
     # Routes
-    my $r = $app->routes;#->bridge('/')->to( 'auths#check', level => 'admin' );
+    my $r = $app->routes;
        $r->namespace('Controller');
     
-    #
-    #$r->route('/help/')->via('get')->to('helps#list');
-    #$r->route('/help/:id')->via('get')->to('helps#read');
-    
-    #= Wiki
     my $w = $r->route('/wiki');
-    #== articles
-    $w->route( '/new'                      )->via('get' )->to('wiki#article_form'  )->name('wiki_article_form'  );
-    $w->route( '/new'                      )->via('post')->to('wiki#article_create')->name('wiki_article_create');
-    $w->route( '/:aid'    , aid => qr/\d+/ )->via('get' )->to('wiki#article_read'  )->name('wiki_article_read'  );
-    $w->route( '/:aid'    , aid => qr/\d+/ )->via('post')->to('wiki#article_update')->name('wiki_article_update');
-    $w->route( '/:aid/del', aid => qr/\d+/ )->via('post')->to('wiki#article_delete')->name('wiki_article_delete');
+       $w->route( '/new'                      )->via('get' )->to('wiki#article_form'  )->name('wiki_article_form'  );
+       $w->route( '/new'                      )->via('post')->to('wiki#article_create')->name('wiki_article_create');
+       $w->route( '/:aid'    , aid => qr/\d+/ )->via('get' )->to('wiki#article_read'  )->name('wiki_article_read'  );
+       $w->route( '/:aid'    , aid => qr/\d+/ )->via('post')->to('wiki#article_update')->name('wiki_article_update');
+       $w->route( '/:aid/del', aid => qr/\d+/ )->via('post')->to('wiki#article_delete')->name('wiki_article_delete');
     
-    #== revisions
-    $w->route( '/:aid/:rid'    , aid => qr/\d+/, rid => qr/\d+/ )->via('get' )->to('wiki#revision_read'  )->name('wiki_revision_read'  );
-    $w->route( '/:aid/:rid'    , aid => qr/\d+/, rid => qr/\d+/ )->via('post')->to('wiki#revision_update')->name('wiki_revision_update');
-    $w->route( '/:aid/:rid/del', aid => qr/\d+/, rid => qr/\d+/ )->via('post')->to('wiki#revision_delete')->name('wiki_revision_delete');
+       my $rev = $w->route( '/:aid/:rid', aid => qr/\d+/, rid => qr/\d+/ );
+          $rev->via('get' )->to('wiki#revision_read'  )->name('wiki_revision_read'  );
+          $rev->via('post')->to('wiki#revision_update')->name('wiki_revision_update');
+          $rev->route('/del')->via('post')->to('wiki#revision_delete')->name('wiki_revision_delete');
     
     $app->helper (
         is => sub {
@@ -103,69 +129,6 @@ sub startup {
         }
     );
 }
-
-package Gitty::I18N::ru;
-use base 'Gitty::I18N';
-
-use Encode 'decode';
-
-our %Lexicon = (
-    _AUTO => 1,
-    'Repo'          => 'Репозиторий',
-    'Repos'         => 'Репозитории',
-    'New repo'      => 'Создать новый',
-    'Add key'       => 'Добавить ключ',
-    'name'          => 'имя',
-    'members'       => 'пользователи',
-    'description'   => 'описание',
-    'password'      => 'пароль',
-    'repeat'        => 'повторить',
-    'registered'    => 'зарегистрирован',
-    'Register'      => 'Регистрирация',
-    'ban reason'    => 'причина блокировки',
-    'ban time'      => 'время блокировки',
-    'now'           => 'сейчас',
-    'Add'           => 'Добавить',
-    'status'        => 'статус',
-    'active'        => 'активный',
-    'inactive'      => 'деактивирован',
-    'week'          => 'неделя',
-    'day'           => 'день',
-    'hour'          => 'час',
-   
-    'description'   => 'описание',
-   
-    'ban options'   => 'блокировка',
-    
-    'Profile'       => 'Профиль',
-    'Login'         => 'Войти',
-    'Login via mail'=> 'Войти с почты',
-    'Logout'        => 'Выйти',
-    
-    'Add server'    => 'Добавить сервер',
-    
-    'index'         => 'Главная',
-    
-    'mins1'         => 'минуту',
-    'mins2'         => 'минуты',
-    'mins5'         => 'минут',
-    
-    'hours1'        => 'час',
-    'hours2'        => 'часа',
-    'hours5'        => 'часов',
-    
-    'ago'           => 'назад',
-    
-    'a few seconds ago' => 'несколько секунд назад',
-    'Your public key'   => 'Ваш публичный ключ',
-    'Create new repo'   => 'Создать новый репозиторий',
-    'Repository list'   => 'Список репозиториев',
-    'change password'   => 'сменить пароль',
-    'How to create new repository' => 'Как создать новый репозиторий',
-    'Add server public key'        => 'Добавить публичный ключ сервера',
-);
-
-$Lexicon{$_} = decode('utf8', $Lexicon{$_}) for keys %Lexicon;
 
 1;
 

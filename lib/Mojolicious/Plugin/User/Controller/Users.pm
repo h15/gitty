@@ -1,22 +1,18 @@
 package Mojolicious::Plugin::User::Controller::Users;
-
 use Mojo::Base 'Mojolicious::Controller';
-
-use Model::User::User;
 
 sub read {
     my $self = shift;
     
 	# Does it exist?
-	unless ( Model::User::User->new( id => $self->stash('id') )->load(speculative => 1) ) {
+	unless ( $self->model('User')->exists(id => $self->stash('id')) ) {
 	    return $self->error("User with this id doesn't exist!");
 	}
 
-	my $user = Model::User::User->new( id => $self->stash('id') )->load;
+	my $user = $self->model('User')->find(id => $self->stash('id'));
     
-    if ( $self->user->id != 1                         # not Anonymous
-        && ( $self->param('id') == $self->user->id    # and Self
-             || $self->user->is_admin ) ) {         #  or Admin.
+    # not Anonymous ( and Self or Admin )
+    if ( $self->user->id != 1 && ( $self->param('id') == $self->user->id || $self->user->is_admin ) ) {
         $self->read_extended($user);
     }
     else {
@@ -26,9 +22,9 @@ sub read {
 }
 
 sub read_extended {
-    my ( $self, $user ) = @_;
-    $self->stash( user => $user );
-    $self->render( action => 'read_extended' );
+    my( $self, $user ) = @_;
+        $self->stash( user => $user );
+        $self->render( action => 'read_extended' );
 }
 
 sub create {
@@ -37,7 +33,7 @@ sub create {
     return $self->error('CAPTCHA test failed.') unless $self->captcha;
     
     # Does it exist?
-	if ( Model::User::User->new(mail => $self->param('mail'))->load(speculative => 1) ) {
+	if ( $self->model('User')->exists(mail => $self->param('mail')) ) {
 	    return $self->error("User with this id already exists!");
 	}
     
@@ -49,7 +45,7 @@ sub create {
         { key  => $key, mail => $self->param('mail') }
     );
     
-    my $user = Model::User::User->new (
+    my $user = $self->model('User')->create (
         mail         => $self->param('mail'),
         regdate      => time,
         confirm_time => time + 86400,               # Day for activate
@@ -65,18 +61,16 @@ sub update {
     my $self = shift;
     
     # Can change?
-    unless ( $self->user->id != 1
-            && ( $self->param('id') == $self->user->id
-                || $self->user->is_admin ) ) {
+    unless ( $self->user->id != 1 && ( $self->param('id') == $self->user->id || $self->user->is_admin ) ) {
         return $self->error("Permission denied!");
     }
     
     # Does it exist?
-	unless ( Model::User::User->new(id => $self->param('id'))->load(speculative => 1) ) {
+	unless ( $self->model('User')->exists(id => $self->param('id')) ) {
 	    return $self->error("User with this id doesn't exist!");
 	}
     
-    my $user = Model::User::User->new( id => $self->param('id') )->load;
+    my $user = $self->model('User')->find(id => $self->param('id'));
        $user->name      ( $self->param('name'      ) ) if defined $self->param('name') && ! defined $user->name;
        $user->mail      ( $self->param('mail'      ) ) if defined $self->param('mail');
        $user->ban_time  ( $self->param('ban_time'  ) ) if defined $self->param('ban_time');

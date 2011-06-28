@@ -1,8 +1,5 @@
 package Mojolicious::Plugin::User::Controller::Auths;
-
 use Mojo::Base 'Mojolicious::Controller';
-
-use Model::User::User;
 
 sub login {
 	my $self = shift;
@@ -13,11 +10,11 @@ sub login {
 	$self->IS( mail => $self->param('mail')	);
 	
 	# Does it exist?
-	unless ( Model::User::User->new( mail => $self->param('mail') )->load(speculative => 1) ) {
+	unless ( $self->model('User')->exists(mail => $self->param('mail')) ) {
 	    return $self->error("This pair(e-mail and password) doesn't exist!");
 	}
 	
-	my $user = Model::User::User->new( mail => $self->param('mail') )->load;
+	my $user = $self->model('User')->find( mail => $self->param('mail') );
     
     # Password test:
     #   hash != md5( regdate + password + salt )
@@ -45,21 +42,20 @@ sub mail_request {
 	$self->IS( mail => $self->param('mail') );
 	
 	# Does it exist?
-	unless ( Model::User::User->new( mail => $self->param('mail') )->load(speculative => 1) ) {
+	unless ( $self->model('User')->exists(mail => $self->param('mail')) ) {
 	    return $self->error( "This e-mail doesn't exist in data base!" );
 	}
 	
 	my $confirm_key = Digest::MD5::md5_hex(rand);
 	
-	my $user = Model::User::User->new( mail => $self->param('mail') )->load;
+	my $user = $self->model('User')->find( mail => $self->param('mail') );
        $user->confirm_key($confirm_key);
        $user->confirm_time( time + 86400 );
        $user->save;
     
     # Send mail
     $self->mail( confirm =>
-        $self->param('mail'),
-        'Change password',
+        $self->param('mail'), 'Change password',
         { key  => $confirm_key, mail => $self->param('mail') }
     );
     
@@ -71,11 +67,11 @@ sub mail_confirm {
     my $mail = $self->param('mail');
     
 	# Does it exist?
-	unless ( Model::User::User->new( mail => $self->param('mail') )->load(speculative => 1) ) {
+	unless ( $self->model('User')->exists(mail => $self->param('mail')) ) {
 	    return $self->error('Auth failed!');
 	}
 	
-	my $user = Model::User::User->new( mail => $mail )->load;
+	my $user = $self->model('User')->find(mail => $mail);
     
     my $cfg = $self->stash('user');
     

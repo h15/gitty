@@ -11,21 +11,20 @@ sub create_repo {
     return $self->error('Already exists')       if $self->gitosis->find_group( $self->param('name') );
     
     my @members = split /\s+/, $self->param('members');
-    unshift @members, 'u' . $self->user->id unless grep {$_ == 'u' . $self->user->id} @members;
-    
-    @members = map { $_ =~ /^u/i ? $_ : "u$_" } @members;
+       @members = ( @members, $self->user->id ) unless grep { $_ == 'u' . $self->user->id } @members;
+       @members = map { $_ =~ /^u/i ? $_ : "u$_" } @members;
     
     $self->gitosis->add_group ({
         $self->param('name') => {
             members => \@members,
-            dir => $self->param('name')
+            dir     => $self->param('name')
         }
     });
+    
     $self->gitosis->add_repo ({
-        $self->param('name') => {
-            desc => $self->param('desc')
-        }
+        $self->param('name') => { desc => $self->param('desc') }
     });
+    
     $self->gitosis->save;
     
     $self->redirect_to('gits_read', repo => $self->param('name'));
@@ -33,12 +32,8 @@ sub create_repo {
 
 sub list {
     my $self = shift;
-    
-    $self->stash (
-        repos => [ keys %{$self->gitosis->{groups}} ]
-    );
-    
-    $self->render;
+       $self->stash( repos => [ keys %{$self->gitosis->{groups}} ] );
+       $self->render;
 }
 
 sub read {
@@ -72,16 +67,14 @@ sub update {
     return $self->error('Repo does not exist') unless defined %$group;
     
     my @members = split /\s+/, $self->param('members');
-    return $self->error('You are not owner') if 'u'.$self->user->id ne $members[0];
+    return $self->error('You are not owner') if 'u' . $self->user->id ne $members[0];
     
     if ( $repo ) {
         $repo->{desc} = $self->param('desc');
     }
     else {
         $self->gitosis->add_repo({
-            $self->param('name') => {
-                desc => $self->param('desc')
-            }
+            $self->param('name') => { desc => $self->param('desc') }
         });
     }
     

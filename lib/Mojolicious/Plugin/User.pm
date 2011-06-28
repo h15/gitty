@@ -1,9 +1,7 @@
 package Mojolicious::Plugin::User;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Digest::MD5 "md5_hex";
-use Model::User::User;
 
 our $VERSION = 0.3;
 
@@ -12,7 +10,7 @@ sub register {
     
     $app->fatal('Config must be defined.') unless defined %$conf;
     
-    my $user = new Model::User::User;
+    my $user = $app->model('User')->find(id => 1);
     
     $app->secret( $conf->{cookies} );
     $app->sessions->default_expiration( 3600 * 24 * $conf->{confirm} );
@@ -26,11 +24,11 @@ sub register {
         # Anonymous has 1st id.
         $id ||= 1;
         
-        $user = Model::User::User->new( id => $id )->load;
+        $user = $self->model('User')->find( id => $id );
         
         unless ( $user->is_active ) {
             my $ban = $user->ban_reason;
-            $user = Model::User::User->new( id => 1 )->load;
+            $user = $self->model('User')->find( id => 1 );
             $user->ban_reason($ban);
         }
     });
@@ -63,7 +61,7 @@ sub register {
         render_user => sub {
             my ( $self, $id ) = @_;
             
-            my $user = Model::User::User->new( id => $id );
+            my $user = $self->model('User')->create( id => $id );
             
             return new Mojo::ByteStream (
                 '<a href="' . $app->url_for( 'users_read', id => $id ) . '" class="' .

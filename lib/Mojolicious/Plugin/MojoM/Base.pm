@@ -1,10 +1,10 @@
-package Model::Base;
+package Mojolicious::Plugin::MojoM::Base;
 
-use Model::Config;
+use Mojolicious::Plugin::MojoM::Config;
 
 use base qw/Rose::DB::Object/;
 
-sub init_db { Model::Config->new() }
+sub init_db { Mojolicious::Plugin::MojoM::Config->new() }
 
 1;
 

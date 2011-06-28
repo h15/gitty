@@ -1,19 +1,15 @@
 package Controller::Wiki;
-
 use Mojo::Base 'Mojolicious::Controller';
-
-use Model::Wiki::Article;
-use Model::Wiki::Revision;
 
 sub article_read {
     my $self = shift;
  
     # Is not exist
-    unless ( Model::Wiki::Article->new(id => $self->param('aid'))->load(speculative => 1) ) {
+    unless ( $self->model('Article')->exists(id => $self->param('aid')) ) {
         return $self->redirect_to('wiki_article_form');
     }
     
-    my $art = Model::Wiki::Article->new( id => $self->param('aid') )->load;
+    my $art = $self->model('Article')->find( id => $self->param('aid') );
     my $rev = $art->revision;
     
     $self->stash( page => {
@@ -31,14 +27,14 @@ sub article_create {
     my $self = shift;
     
     # Is not exist
-    if ( Model::Wiki::Article->new(title => $self->param('title'))->load(speculative => 1) ) {
+    if ( $self->model('Article')->exists(title => $self->param('title')) ) {
         return $self->redirect_to('wiki_article_form');
     }
     
     # Make new revision, get revision id.
     # Make new article, using revision id, get article id.
     # Update revision's article id.
-    my $rev = Model::Wiki::Revision->new (
+    my $rev = $self->model('Revision')->create (
         text        => $self->param('text'),
         article_id  => 0,
         datetime    => time,
@@ -46,7 +42,7 @@ sub article_create {
     );
     $rev->save;
     
-    my $art = Model::Wiki::Article->new (
+    my $art = $self->model('Article')->create (
         title       => $self->param('title'),
         revision_id => $rev->id,
         status      => $self->user->is_admin ? $self->param('status') : 0,
@@ -65,30 +61,31 @@ sub article_update {
     my $self = shift;
     
     # Is exist
-    unless ( Model::Wiki::Article->new( id => $self->param('aid'))->load(speculative => 1) ) {
+    unless ( $self->model('Article')->exists( id => $self->param('aid')) ) {
         return $self->redirect_to('wiki_article_form');
     }
     
-    my $art = Model::Wiki::Article->new( id => $self->param('aid') )->load;
+    my $art = $self->model('Article')->find( id => $self->param('aid') );
     
     unless ( $self->user->is_admin || $art->status != 1 ) {
         return $self->redirect_to( 'wiki_article_read', aid => $art->id );
     }
     
     # New revision
-    my $rev = Model::Wiki::Revision->new (
+    my $rev = $self->model('Revision')->create (
         text        => $self->param('text'),
         article_id  => $self->param('aid'),
         datetime    => time,
         user        => $self->user->id,
     );
     $rev->save;
+    
     $art->revision_id( $rev->id );
     
     # Update some fields from article.
     if ( $self->param('title') ne $art->title ) {
         # If the article with a same title exists.
-        if ( Model::Wiki::Article->new(title => $self->param('title')) ) {
+        if ( $self->model('Article')->exists(title => $self->param('title')) ) {
             return $self->redirect_to('wiki_article_form');
         }
         $art->title( $self->param('title') );
@@ -105,13 +102,13 @@ sub revision_read {
     my $self = shift;    
 
     # Is exist
-    unless ( Model::Wiki::Article ->new( id => $self->param('aid') )->load(speculative => 1)
-          && Model::Wiki::Revision->new( id => $self->param('rid') )->load(speculative => 1) ) {
+    unless ( $self->model('Article' )->exists( id => $self->param('aid') )
+          && $self->model('Revision')->exists( id => $self->param('rid') ) ) {
         return $self->redirect_to('wiki_article_form');
     }
     
-    my $art = Model::Wiki::Article ->new( id => $self->param('aid') )->load;
-    my $rev = Model::Wiki::Revision->new( id => $self->param('rid') )->load;
+    my $art = $self->model('Article' )->find( id => $self->param('aid') );
+    my $rev = $self->model('Revision')->find( id => $self->param('rid') );
     
     if ( $rev->article_id != $art->id ) {
         $self->redirect_to( 'wiki_article_read', aid => $art->id );
@@ -133,13 +130,13 @@ sub revision_update {
     my $self = shift;
     
     # Is exist
-    unless ( Model::Wiki::Article ->new( id => $self->param('aid') )->load(speculative => 1)
-          && Model::Wiki::Revision->new( id => $self->param('rid') )->load(speculative => 1) ) {
+    unless ( $self->model('Article' )->exists( id => $self->param('aid') )
+          && $self->model('Revision')->exists( id => $self->param('rid') ) ) {
         return $self->redirect_to('wiki_article_form');
     }
     
-    my $art = Model::Wiki::Article ->new( id => $self->param('aid') )->load;
-    my $rev = Model::Wiki::Revision->new( id => $self->param('rid') )->load;
+    my $art = $self->model('Article' )->find( id => $self->param('aid') );
+    my $rev = $self->model('Revision')->find( id => $self->param('rid') );
     
     unless ( $self->user->is_admin || $art->status != 1 ) {
         return $self->redirect_to( 'wiki_article_read', aid => $art->id );
