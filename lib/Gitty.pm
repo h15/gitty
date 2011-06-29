@@ -18,23 +18,40 @@ sub startup {
         }
     );
     
-    $app->model('User')->init (
-        table      => 'users',
+    $app->model('User')->init;
+    $app->model('Article')->init (
+        table      => 'articles',
         columns    => [
-            id           => { type => 'serial' , not_null => 1 },
-            groups       => { type => 'text'   , not_null => 1 },
-            regdate      => { type => 'integer', not_null => 1 },
-            name         => { type => 'varchar', length => 32 },
-            mail         => { type => 'varchar', not_null => 1, length => 64 },
-            password     => { type => 'varchar', not_null => 1, default => 0, length => 32 },
-            ban_reason   => { type => 'integer', not_null => 1, default => 0 },
-            ban_time     => { type => 'integer', not_null => 1, default => 0 },
-            confirm_key  => { type => 'varchar', not_null => 1, length => 32 },
-            confirm_time => { type => 'integer', not_null => 1, length => 32 },
+            id          => { type => 'serial' , not_null => 1 },
+            title       => { type => 'varchar', length => 255, not_null => 1 },
+            revision_id => { type => 'integer' },
+            status      => { type => 'integer' },
         ],
-        pk_columns => 'id'  ,
-        unique_key => 'mail',
-        unique_key => 'name',
+        pk_columns => 'id',
+        unique_key => 'title',
+        foreign_keys => [
+            revision    => {
+                class       => 'Model::Wiki::Revision',
+                key_columns => { revision_id => 'id' },
+            },
+        ],
+    );
+    $app->model('Revision')->init (
+        table      => 'revisions',
+        columns    => [
+            id          => { type => 'serial',  not_null => 1 },
+            text        => { type => 'text',    not_null => 1 },
+            article_id  => { type => 'integer', not_null => 1 },
+            datetime    => { type => 'integer', not_null => 1 },
+            user        => { type => 'integer', not_null => 1 },
+        ],
+        pk_columns => 'id',
+        foreign_keys => [
+            article     => {
+                class       => 'Model::Wiki::Article',
+                key_columns => { article_id => 'id' },
+            },
+        ],
     );
     
     $app->plugin('captcha');
