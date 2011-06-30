@@ -16,7 +16,7 @@ Now it can makes and use Users, tunes gitosis config, adds public keys.
 
 =head2 Install Perl modules
 
-    curl -L cpanmin.us | perl - Mojolicious DBIx::Simple SQL::Abstract MIME::Lite
+    curl -L cpanmin.us | perl - Mojolicious Rose::DB Rose::DB::Object
 
 =head2 Change default configuration.
 
@@ -29,7 +29,8 @@ Users' accounts need some data for save.
 
 =head3 For MySQL
 
-    CREATE TABLE `gitty`.`gitty__users` (
+
+    CREATE TABLE `gitty`.`users` (
         `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
         `groups` TINYTEXT NOT NULL ,
         `name` VARCHAR( 32 ) CHARACTER SET utf8 COLLATE utf8_bin NULL ,
@@ -49,6 +50,33 @@ Users' accounts need some data for save.
     ) ENGINE = MYISAM ;
 
     INSERT INTO `gitty__users` (`id`, `groups`, `name`, `mail`, `regdate`, `password`, `ban_reason`, `ban_time`, `confirm_key`, `confirm_time`) VALUES(1, '', 'anonymous', 'anonymous@lorcode.org', 0, '0', 0, 0, '', 0);
+
+
+    CREATE TABLE `gitty`.`articles` (
+        `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+        `title` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL ,
+        `revision_id` INT( 11 ) UNSIGNED NOT NULL ,
+        `status` INT( 2 ) UNSIGNED NOT NULL ,
+        PRIMARY KEY ( `id` ) ,
+        FOREIGN KEY ( `revision_id` ) REFERENCES revisions ( `id` ),
+        INDEX ( `id` ) ,
+        UNIQUE (
+            `title`
+        )
+    ) ENGINE = MYISAM;
+
+
+    CREATE TABLE `gitty`.`revisions` (
+        `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+        `article_id` INT( 11 ) UNSIGNED NOT NULL ,
+        `text` TEXT CHARACTER SET utf8 COLLATE utf8_bin NOT NULL ,
+        `datetime` INT( 11 ) UNSIGNED NOT NULL ,
+        `user` INT( 11 ) UNSIGNED NOT NULL ,
+        PRIMARY KEY ( `id` ) ,
+        FOREIGN KEY ( `article_id` ) REFERENCES articles ( `id` ),
+        INDEX ( `id` )
+    ) ENGINE = MYISAM ;
+
 
 =head1 Run
 
