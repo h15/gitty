@@ -120,6 +120,11 @@ CODE
                 return $class->new(@fields)->load;
             }
             
+            $app->log->error (
+                "Trying to get a nonexistent record from the database!\n".
+                $app->dumper(\@fields)
+            );
+            
             return 0;
         }
     );
