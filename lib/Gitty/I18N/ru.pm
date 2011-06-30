@@ -15,7 +15,7 @@ our %Lexicon = (
     'password'      => 'пароль',
     'repeat'        => 'повторить',
     'registered'    => 'зарегистрирован',
-    'Register'      => 'Регистрирация',
+    'Register'      => 'Регистрация',
     'ban reason'    => 'причина блокировки',
     'ban time'      => 'время блокировки',
     'now'           => 'сейчас',
@@ -57,6 +57,7 @@ our %Lexicon = (
     'change password'   => 'сменить пароль',
     'How to create new repository' => 'Как создать новый репозиторий',
     'Add server public key'        => 'Добавить публичный ключ сервера',
+    'This page does not exist or you can\'t read it.' => 'Эта страница не существует, или у Вас не хватает прав.'
 );
 
 $Lexicon{$_} = decode('utf8', $Lexicon{$_}) for keys %Lexicon;

@@ -15,6 +15,6 @@
 
 % content_for body => begin
     <article class="rounded error">
-        This page does not exist or you cann't read it.
+        This page does not exist or you can't read it.
     </article>
 % end
