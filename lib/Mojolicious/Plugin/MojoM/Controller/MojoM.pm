@@ -9,15 +9,35 @@ sub list {
 
 sub read {
     my $self = shift;
+       $self->stash (
+           models  => $self->model($self->param('id'))->range($self->param('start'), $self->param('offset')),
+           columns => [ $self->model($self->param('id'))->raw->meta->column_names ]
+       );
+       $self->render;
+}
+
+sub row_read {
+    my $self = shift;
+       $self->stash (
+           model   => $self->model($self->param('id'))->find( id => $self->param('rid') ),
+           columns => [ $self->model($self->param('id'))->raw->meta->column_names ]
+       );
+       $self->render;
+}
+
+sub row_update {
+    my $self = shift;
     
     my @columns = $self->model($self->param('id'))->raw->meta->column_names;
-                      
-    $self->stash (
-        models  => $self->model($self->param('id'))
-                        ->range($self->param('start'), $self->param('offset')),
-        columns => \@columns
+    my $model   = $self->model($self->param('id'))->find( id => $self->param('rid') );
+       $model->$_( $self->param("field-$_") ) for @columns;
+       $model->save;
+
+    $self->redirect_to (
+        mojo_m_row_read =>
+        id  => $self->stash('id'),
+        rid => $self->param('rid')
     );
-    $self->render;
 }
 
 1;
