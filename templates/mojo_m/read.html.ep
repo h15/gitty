@@ -1,0 +1,38 @@
+% extends 'base';
+
+% content_for header => begin
+    <%= param('id') %>
+% end
+
+% content body => begin
+
+<div>
+    <table class="plugin rounded wide" rules="all" style="overflow:auto">
+        <tr>
+            <td><div style="width:78px;"></div></td>
+%    for my $c ( @$columns ) {
+            <td>
+%=              $c
+            </td>
+%    }
+        </tr>
+% for my $m ( @$models ) {
+        <tr>
+            <td>
+                <a href="<%= url_for('mojo_m_row_read' , id => param('id'), rid => $m->id) %>"><img src="/img/icon/show.png"></a>
+                <form class=hidden method=post action="<%= url_for('mojo_m_row_update', id => param('id'), rid => $m->id) %>" name=upd></form>
+                    <a href="#" onClick="document.upd.submit();return false"><img src="/img/icon/edit.png"></a>
+                <form class=hidden method=delete action="<%= url_for('mojo_m_row_delete', id => param('id'), rid => $m->id) %>" name=del></form>
+                    <a href="#" onClick="document.del.submit();return false"><img src="/img/icon/delete.png"></a>
+            </td>
+%    for my $c ( @$columns ) {
+            <td>
+%=              $m->$c
+            </td>
+%    }
+        </tr>
+% }
+    </table>
+</div>
+
+% end

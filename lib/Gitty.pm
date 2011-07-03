@@ -70,17 +70,17 @@ sub startup {
     my $r = $app->routes;
        $r->namespace('Controller');
     
-    my $w = $r->route('/wiki');
-       $w->route( '/new'                      )->via('get' )->to('wiki#article_form'  )->name('wiki_article_form'  );
-       $w->route( '/new'                      )->via('post')->to('wiki#article_create')->name('wiki_article_create');
-       $w->route( '/:aid'    , aid => qr/\d+/ )->via('get' )->to('wiki#article_read'  )->name('wiki_article_read'  );
-       $w->route( '/:aid'    , aid => qr/\d+/ )->via('post')->to('wiki#article_update')->name('wiki_article_update');
-       $w->route( '/:aid/del', aid => qr/\d+/ )->via('post')->to('wiki#article_delete')->name('wiki_article_delete');
-    
-       my $rev = $w->route( '/:aid/:rid', aid => qr/\d+/, rid => qr/\d+/ );
-          $rev->via('get' )->to('wiki#revision_read'  )->name('wiki_revision_read'  );
-          $rev->via('post')->to('wiki#revision_update')->name('wiki_revision_update');
-          $rev->route('/del')->via('post')->to('wiki#revision_delete')->name('wiki_revision_delete');
+        my $w = $r->route('/wiki');
+           $w->route( '/new'                      )->via('get' )->to('wiki#article_form'  )->name('wiki_article_form'  );
+           $w->route( '/new'                      )->via('post')->to('wiki#article_create')->name('wiki_article_create');
+           $w->route( '/:aid'    , aid => qr/\d+/ )->via('get' )->to('wiki#article_read'  )->name('wiki_article_read'  );
+           $w->route( '/:aid'    , aid => qr/\d+/ )->via('post')->to('wiki#article_update')->name('wiki_article_update');
+           $w->route( '/:aid/del', aid => qr/\d+/ )->via('post')->to('wiki#article_delete')->name('wiki_article_delete');
+        
+           my $rev = $w->route( '/:aid/:rid', aid => qr/\d+/, rid => qr/\d+/ );
+              $rev->via('get' )->to('wiki#revision_read'  )->name('wiki_revision_read'  );
+              $rev->via('post')->to('wiki#revision_update')->name('wiki_revision_update');
+              $rev->route('/del')->via('post')->to('wiki#revision_delete')->name('wiki_revision_delete');
     
     $app->helper (
         is => sub {

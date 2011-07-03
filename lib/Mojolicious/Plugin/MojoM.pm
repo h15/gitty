@@ -4,12 +4,19 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Storable 'freeze';
 
 sub register {
-    my ( $mojom, $app, $conf ) = @_;
+    my ( $self, $app, $conf ) = @_;
     
-    my $r = $app->routes;
-       $r->namespace('Mojolicious::Plugin::MojoM::Controller');
-       my $a = $r->route('/admin/db/');
-          $a->to('admin#list')->name('admin#list');
+    # Routes
+    my $r = $app->routes->to( namespace => 'Mojolicious::Plugin::MojoM::Controller' );
+    
+       my $a = $r->bridge('/db')->to( cb => sub { shift->user->is_admin } );
+          $a->route('/')->via('get')->to('mojo_m#list')->name('mojo_m_list');
+          $a->route('/:id', id => qr/[A-Za-z0-9\:]+/)->via('get')->to('mojo_m#read')->name('mojo_m_read');
+            
+          my $row = $a->route('/:id/:rid', id => qr/[A-Za-z0-9\:]+/, rid => qr/\d+/);
+             $row->route('/')->via('get'   )->to('mojo_m#row_read'  )->name('mojo_m_row_read'  );
+             $row->route('/')->via('post'  )->to('mojo_m#row_update')->name('mojo_m_row_update');
+             $row->route('/')->via('delete')->to('mojo_m#row_delete')->name('mojo_m_row_delete');
     
     # Init DB.
     # Make Base Class.
@@ -46,7 +53,7 @@ sub register {
         model => sub {
             my ( $self, $name ) = @_;
             
-            return $self unless $name;
+            return $class unless $name;
             
             $class->model($name);
             $class->add_model( $name => 1 ) unless exists $class->models->{$name};
@@ -63,8 +70,6 @@ use Storable 'freeze';
 has models => sub {{}};
 has model  => undef;
 has app    => undef;
-
-sub _new { shift->app(shift) }
 
 sub add_model {
     my ( $self, $key, $val ) = @_;
@@ -99,6 +104,15 @@ sub init {
                     my \$a = thaw('$code');
 
                     __PACKAGE__->meta->setup( \@\$a );
+                    
+                    # Manager
+                    
+                    package Mojolicious::Plugin::MojoM::Model::${name}::Manager;
+                    use base 'Rose::DB::Object::Manager';
+
+                    sub object_class { 'Mojolicious::Plugin::MojoM::Model::$name' }
+
+                    __PACKAGE__->make_manager_methods( lc '$name' );
 
                     1;
                   };
@@ -148,6 +162,40 @@ sub exists {
     eval "require $class";
     
     $class->new(@fields)->load(speculative => 1) ? 1 : 0;
+}
+
+sub list {
+    my ( $self, @fields ) = @_;
+    
+    my $name  = $self->model;
+    my $class = "Mojolicious::Plugin::MojoM::Model::${name}::Manager";
+    
+    eval "require $class";
+    
+    $class->get_objects(
+        @fields,
+        object_class => "Mojolicious::Plugin::MojoM::Model::$name"
+    )
+}
+
+sub range {
+    my ( $self, $start, $offset ) = @_;
+    
+    $self->list(
+        sort_by => 'id DESC',
+        limit   => $offset,
+        offset  => $start,
+    );
+}
+
+sub raw {
+    my $self  = shift;
+    my $name  = $self->model;
+    my $class = "Mojolicious::Plugin::MojoM::Model::$name";
+    
+    eval "require $class";
+    
+    return $class;
 }
 
 1;

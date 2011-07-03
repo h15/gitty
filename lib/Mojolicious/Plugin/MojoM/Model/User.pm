@@ -6,13 +6,13 @@ __PACKAGE__->meta->setup(
     table      => 'users',
     columns    => [
         id           => { type => 'serial' , not_null => 1 },
-        groups       => { type => 'text'   , not_null => 1 },
-        regdate      => { type => 'integer', not_null => 1 },
         name         => { type => 'varchar', length => 32 },
-        mail         => { type => 'varchar', not_null => 1, length => 64 },
-        password     => { type => 'varchar', not_null => 1, default => 0, length => 32 },
         ban_reason   => { type => 'integer', not_null => 1, default => 0 },
         ban_time     => { type => 'integer', not_null => 1, default => 0 },
+        groups       => { type => 'text'   , not_null => 1 },
+        regdate      => { type => 'integer', not_null => 1 },
+        mail         => { type => 'varchar', not_null => 1, length => 64 },
+        password     => { type => 'varchar', not_null => 1, default => 0, length => 32 },
         confirm_key  => { type => 'varchar', not_null => 1, length => 32 },
         confirm_time => { type => 'integer', not_null => 1, length => 32 },
     ],
@@ -39,6 +39,15 @@ sub is_admin {
     }
     return 0;
 }
+
+# Manager
+
+package Mojolicious::Plugin::MojoM::Model::User::Manager;
+use base 'Rose::DB::Object::Manager';
+
+sub object_class { 'Mojolicious::Plugin::MojoM::Model::User' }
+
+__PACKAGE__->make_manager_methods( 'user' );
 
 1;
 
