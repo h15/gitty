@@ -28,16 +28,31 @@ sub row_read {
 sub row_update {
     my $self = shift;
     
-    my @columns = $self->model($self->param('id'))->raw->meta->column_names;
-    my $model   = $self->model($self->param('id'))->find( id => $self->param('rid') );
-       $model->$_( $self->param("field-$_") ) for @columns;
-       $model->save;
+    my @cols  = $self->model($self->param('id'))->raw->meta->column_names;
+    my $model = $self->model($self->param('id'))->find( id => $self->param('rid') );
+    
+    grep { $_ ne 'id' } @cols;
+    
+    map { $model->$_( $self->param("field-$_") ) } @cols
+            if grep { defined $self->param("field-$_") } @cols;
+    
+    $model->save;
 
     $self->redirect_to (
         mojo_m_row_read =>
         id  => $self->stash('id'),
         rid => $self->param('rid')
     );
+}
+
+sub row_delete {
+    my $self = shift;
+    
+    my @columns = $self->model($self->param('id'))->raw->meta->column_names;
+    my $model   = $self->model($self->param('id'))->find( id => $self->param('rid') );
+       $model->delete;
+
+    $self->redirect_to( mojo_m_read => id  => $self->stash('id') );
 }
 
 1;

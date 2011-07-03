@@ -14,9 +14,9 @@ sub register {
           $a->route('/:id', id => qr/[A-Za-z0-9\:]+/)->via('get')->to('mojo_m#read')->name('mojo_m_read');
             
           my $row = $a->route('/:id/:rid', id => qr/[A-Za-z0-9\:]+/, rid => qr/\d+/);
-             $row->route('/')->via('get'   )->to('mojo_m#row_read'  )->name('mojo_m_row_read'  );
-             $row->route('/')->via('post'  )->to('mojo_m#row_update')->name('mojo_m_row_update');
-             $row->route('/')->via('delete')->to('mojo_m#row_delete')->name('mojo_m_row_delete');
+             $row->route('/'   )->via('get' )->to('mojo_m#row_read'  )->name('mojo_m_row_read'  );
+             $row->route('/'   )->via('post')->to('mojo_m#row_update')->name('mojo_m_row_update');
+             $row->route('/del')->via('get' )->to('mojo_m#row_delete')->name('mojo_m_row_delete');
     
     # Init DB.
     # Make Base Class.
