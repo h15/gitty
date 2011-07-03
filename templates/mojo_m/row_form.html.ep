@@ -1,0 +1,26 @@
+% extends 'base';
+
+% content_for header => begin
+    <%= param('id') %>
+% end
+
+% content body => begin
+
+<form method=post action="<%= url_for('mojo_m_row_create', id => param('id')) %>">
+    <table class="plugin rounded wide" rules="rows" style="overflow:auto">
+%    for my $c ( @$columns ) {
+%       next if $c eq 'id';
+        <tr>
+            <td>
+%=              $c
+            </td>
+            <td>
+                <input name="field-<%= $c %>" value="">
+            </td>
+        </tr>
+%    }
+    </table>
+    <input type=submit class=alignright>
+</form>
+
+% end

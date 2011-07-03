@@ -52,7 +52,32 @@ sub row_delete {
     my $model   = $self->model($self->param('id'))->find( id => $self->param('rid') );
        $model->delete;
 
-    $self->redirect_to( mojo_m_read => id  => $self->stash('id') );
+    $self->redirect_to( mojo_m_read => id => $self->stash('id') );
+}
+
+sub row_form {
+    my $self = shift;
+       $self->stash (
+           columns => [ $self->model($self->param('id'))->raw->meta->column_names ]
+       );
+       $self->render;
+}
+
+sub row_create {
+    my $self = shift;
+    
+    my @cols = $self->model($self->param('id'))->raw->meta->column_names;
+    grep { $_ ne 'id' } @cols;
+    
+    my @fields;
+    
+    for my $c (@cols) {
+       push @fields, $c, $self->param("field-$c") if defined $self->param("field-$c");
+    }
+    
+    my $model = $self->model($self->param('id'))->create(@fields);
+       $model->save;
+    $self->redirect_to( mojo_m_read => id => $self->stash('id') );
 }
 
 1;

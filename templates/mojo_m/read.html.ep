@@ -30,6 +30,7 @@
         </tr>
 % }
     </table>
+    <input type=submit onClick="document.location='<%= url_for('mojo_m_row_form', id => param('id')) %>'" class="alignright">
 </div>
 
 % end

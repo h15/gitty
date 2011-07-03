@@ -12,6 +12,9 @@ sub register {
        my $a = $r->bridge('/db')->to( cb => sub { shift->user->is_admin } );
           $a->route('/')->via('get')->to('mojo_m#list')->name('mojo_m_list');
           $a->route('/:id', id => qr/[A-Za-z0-9\:]+/)->via('get')->to('mojo_m#read')->name('mojo_m_read');
+          
+          $a->route('/:id/new', id => qr/[A-Za-z0-9\:]+/)->via('get' )->to('mojo_m#row_form'  )->name('mojo_m_row_form'  );
+          $a->route('/:id/new', id => qr/[A-Za-z0-9\:]+/)->via('post')->to('mojo_m#row_create')->name('mojo_m_row_create');
             
           my $row = $a->route('/:id/:rid', id => qr/[A-Za-z0-9\:]+/, rid => qr/\d+/);
              $row->route('/'   )->via('get' )->to('mojo_m#row_read'  )->name('mojo_m_row_read'  );
