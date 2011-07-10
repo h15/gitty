@@ -19,7 +19,7 @@ sub read {
 sub row_read {
     my $self = shift;
        $self->stash (
-           model   => $self->model($self->param('id'))->find( id => $self->param('rid') ),
+           model   => $self->model( $self->param('id'), $self->param('rid') ),
            columns => [ $self->model($self->param('id'))->raw->meta->column_names ]
        );
        $self->render;

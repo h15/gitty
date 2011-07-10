@@ -54,12 +54,19 @@ sub register {
     
     $app->helper (
         model => sub {
-            my ( $self, $name ) = @_;
+            my ( $self, $name, $id ) = @_;
             
             return $class unless $name;
             
+            # Defined NAME
             $class->model($name);
             $class->add_model( $name => 1 ) unless exists $class->models->{$name};
+            
+            # Defined ID
+            if ( defined $id ) {
+                return $class->find (
+                    $app->model($name)->raw->meta->primary_key || 'id' => $id );
+            }
             
             return $class;
         }
