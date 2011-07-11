@@ -38,10 +38,6 @@ body nav select {
     margin-left:10px;
 }
 
-body nav select.alignright {
-    margin-right:10px;
-}
-
 
 pre {
 	white-space: pre-wrap; /* css-3 */

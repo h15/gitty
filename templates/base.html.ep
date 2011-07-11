@@ -18,17 +18,27 @@
                 <option value="<%= url_for('gits_server_key_form') %>"><%=l 'Add server' %>
             </select>
             
-            <select onChange="this.value[0] == '/' ? document.location = this.value : hide(this.value);" class=alignright>
-                <option selected style="display:none"> <%= user->name %>
-            % if ( user->id != 1 ) {
-                <option value="<%= url_for('users_read', id => user->id) %>"> <%=l 'Profile' %>
-                <option value="<%= url_for('auths_logout') %>">               <%=l 'Logout' %>
-            % } else {
-                <option value="login_form">                                   <%=l 'Login' %>
-                <option value="login_via_mail">                               <%=l 'Login via mail' %>
-                <option value="register_form">                                <%=l 'Register' %>
+            <!-- Right Align -->
+            <div  class=alignright style="padding-right:10px">
+            % if ( user->is_admin ) {
+                <select onChange="this.value[0] == '/' ? document.location = this.value : hide(this.value);">
+                    <option selected style="display:none">                      <%=l 'Admin' %>
+                    <option value="<%= url_for('mojo_m_list') %>">             <%=l 'Data Base' %>
+                </select>
             % }
-            </select>
+            
+                <select onChange="this.value[0] == '/' ? document.location = this.value : hide(this.value);">
+                    <option selected style="display:none"> <%= user->name %>
+                % if ( user->id != 1 ) {
+                    <option value="<%= url_for('users_read', id => user->id) %>"> <%=l 'Profile' %>
+                    <option value="<%= url_for('auths_logout') %>">               <%=l 'Logout' %>
+                % } else {
+                    <option value="login_form">                                   <%=l 'Login' %>
+                    <option value="login_via_mail">                               <%=l 'Login via mail' %>
+                    <option value="register_form">                                <%=l 'Register' %>
+                % }
+                </select>
+            </div>
         </nav>
         <header>
             <h1>
