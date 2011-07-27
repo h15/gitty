@@ -13,6 +13,7 @@ sub read {
            models  => $self->model($self->param('id'))->range($self->param('start'), $self->param('offset')),
            columns => [ $self->model($self->param('id'))->raw->meta->column_names ]
        );
+       
        $self->render;
 }
 

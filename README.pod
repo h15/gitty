@@ -18,10 +18,10 @@ Now it can makes and use Users, tunes gitosis config, adds public keys.
 
     curl -L cpanmin.us | perl - Mojolicious Rose::DB Rose::DB::Object
 
-=head2 Change default configuration.
+=head2 Install initial params.
 
-Normally all configuration consists in C<./lib/Gitty.pm> file.
-You should change it to protect your service.
+    ./script/gitty install host=localhost driver=mysql database=gitty \
+    username=gitty password=secret
 
 =head2 Create data base and tables.
 
@@ -84,11 +84,20 @@ Users' accounts need some data for save.
 
 =head1 Errors
 
-    [-] Please change default data base params.
-        You can get more information in README file.
+=over
 
-You can see this message if you use default data base params or do not set yours params.
-To fix it edit config in file C<./lib/Gitty.pm>.
+=item Problem with config.dat
+
+    Magic number checking on storable string failed at ../../lib/Storable.pm (autosplit into ../../lib/auto/Storable/thaw.al) line 415, at script/../lib/Mojolicious/Plugin/Config.pm line 20
+
+If you see this message, file config.dat was broken. You can fix it by command
+    
+    ./script/joke install host=localhost driver=mysql database=gitty \
+    username=gitty password=secret
+
+But all configs will be lost.
+
+=item Problem with gitosis config file
 
     [-] Need file name!
     [-] Can't read config file!
@@ -96,6 +105,8 @@ To fix it edit config in file C<./lib/Gitty.pm>.
 
 This messages talks you, that Gitty cann't use correctly gitosis' configuration file.
 What Gitty needs:
+
+=over
 
 =item Define path to file
 
@@ -112,6 +123,10 @@ Gitosis config should be readable for Gitty.
 =item Writable
 
 Gitosis config should be writable for Gitty if you want use Gitty for configuration gitosis.
+
+=back
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

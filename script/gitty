@@ -5,6 +5,7 @@ use warnings;
 
 use File::Basename 'dirname';
 use File::Spec;
+use Storable qw(freeze);
 
 use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
 use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
@@ -16,6 +17,25 @@ It looks like you don't have the Mojolicious Framework installed.
 Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
+
+# ./script/joke install host=localhost driver=mysql database=gitty \
+# username=gitty password=secret
+if ( $ARGV[0] eq 'install' )
+{
+    my %conf;
+
+    for my $conf ( @ARGV[1..5] )
+    {
+        %conf = ( %conf, split('=', $conf) );
+    }
+    
+    open  F, '+>./lib/Mojolicious/Plugin/Config/config.dat' or
+        die '[-] Can\'t write into ./lib/Mojolicious/Plugin/Config/config.dat';
+    print F freeze { db => \%conf };
+    close F;
+    
+    exit;
+}
 
 # Application
 $ENV{MOJO_APP} ||= 'Gitty';

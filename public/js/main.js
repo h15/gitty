@@ -26,6 +26,10 @@ window.onload = function() {
   
     var containerHeight = $("#body").height();
     $("#body").height(containerHeight - 128);
+    
+    
+    var left = $("nav.vertical").position().left;
+    $("nav.vertical").css( 'left', left - 327 );
 }
 
 function moveObject(event) {

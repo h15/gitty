@@ -7,80 +7,8 @@ sub startup {
 
     $app->plugin('i18n');
     $app->plugin('message');
-    
-    $app->plugin (
-        'mojo_m' => {
-            driver   => 'mysql',
-            database => 'gitty',
-            host     => 'localhost',
-            username => 'gitty',
-            password => 'gitty',
-        }
-    );
-    
-    $app->model('User')->init;
-    $app->model('Article')->init (
-        table      => 'articles',
-        columns    => [
-            id          => { type => 'serial' , not_null => 1 },
-            title       => { type => 'varchar', length => 255, not_null => 1 },
-            revision_id => { type => 'integer' },
-            status      => { type => 'integer' },
-        ],
-        pk_columns => 'id',
-        unique_key => 'title',
-        foreign_keys => [
-            revision    => {
-                class       => 'Model::Wiki::Revision',
-                key_columns => { revision_id => 'id' },
-            },
-        ],
-    );
-    $app->model('Revision')->init (
-        table      => 'revisions',
-        columns    => [
-            id          => { type => 'serial',  not_null => 1 },
-            text        => { type => 'text',    not_null => 1 },
-            article_id  => { type => 'integer', not_null => 1 },
-            datetime    => { type => 'integer', not_null => 1 },
-            user        => { type => 'integer', not_null => 1 },
-        ],
-        pk_columns => 'id',
-        foreign_keys => [
-            article     => {
-                class       => 'Model::Wiki::Article',
-                key_columns => { article_id => 'id' },
-            },
-        ],
-    );
-    
-    $app->plugin('captcha');
-    
-    $app->plugin( user => {
-        cookies => 'some random string',    # random string for cookie salt;
-        confirm => 7,                       # time to live of session in days;
-        salt    => 'some random string',    # random string for db salt;
-    });
-    
-    $app->plugin( gitosis => {
-        git_home => '/home/h15/gitorepo/gitosis-admin/',
-    });
-
-    # Routes
-    my $r = $app->routes;
-       $r->namespace('Controller');
-    
-        my $w = $r->route('/wiki');
-           $w->route( '/new'                      )->via('get' )->to('wiki#article_form'  )->name('wiki_article_form'  );
-           $w->route( '/new'                      )->via('post')->to('wiki#article_create')->name('wiki_article_create');
-           $w->route( '/:aid'    , aid => qr/\d+/ )->via('get' )->to('wiki#article_read'  )->name('wiki_article_read'  );
-           $w->route( '/:aid'    , aid => qr/\d+/ )->via('post')->to('wiki#article_update')->name('wiki_article_update');
-           $w->route( '/:aid/del', aid => qr/\d+/ )->via('post')->to('wiki#article_delete')->name('wiki_article_delete');
-        
-           my $rev = $w->route( '/:aid/:rid', aid => qr/\d+/, rid => qr/\d+/ );
-              $rev->via('get' )->to('wiki#revision_read'  )->name('wiki_revision_read'  );
-              $rev->via('post')->to('wiki#revision_update')->name('wiki_revision_update');
-              $rev->route('/del')->via('post')->to('wiki#revision_delete')->name('wiki_revision_delete');
+    $app->plugin('config');
+    $app->plugin('gitosis');
     
     $app->helper (
         is => sub {

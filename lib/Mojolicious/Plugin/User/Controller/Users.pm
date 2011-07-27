@@ -75,7 +75,7 @@ sub update {
        $user->mail      ( $self->param('mail'      ) ) if defined $self->param('mail');
        $user->ban_time  ( $self->param('ban_time'  ) ) if defined $self->param('ban_time');
        $user->ban_reason( $self->param('ban_reason') ) if defined $self->param('ban_reason');
-       $user->password  ( Digest::MD5::md5_hex( $user->regdate . $self->param('pass') . $self->stash('salt') ) )
+       $user->password  ( Digest::MD5::md5_hex( $user->regdate . $self->param('pass') . $self->config('user')->{salt} ) )
                                                        if defined $self->param('pass') && $self->param('pass') eq $self->param('pass2');
        $user->save;
     

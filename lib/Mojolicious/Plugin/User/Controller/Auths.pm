@@ -18,7 +18,7 @@ sub login {
     
     # Password test:
     #   hash != md5( regdate + password + salt )
-    my $s = $user->regdate . $self->param('passwd') . $self->stash('salt');
+    my $s = $user->regdate . $self->param('passwd') . $self->config('user')->{salt};
     
     if ( $user->password ne Digest::MD5::md5_hex($s) ) {
         return $self->error( "This pair(e-mail and password) doesn't exist!" );

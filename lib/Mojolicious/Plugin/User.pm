@@ -6,15 +6,24 @@ use Digest::MD5 "md5_hex";
 our $VERSION = 0.3;
 
 sub register {
-    my ( $self, $app, $conf ) = @_;
+    my ( $self, $app ) = @_;
     
-    $app->fatal('Config must be defined.') unless defined %$conf;
+    unless( $app->config('user') )
+    {
+        $app->config( user => {
+            cookies => 'some random string',
+            expiration => 3600 * 24,
+            salt => 'some random string',
+        });
+    }
     
+    $app->model('User')->init;
+    
+    my $conf = $app->config('user');
     my $user = $app->model('User')->find(id => 1);
     
     $app->secret( $conf->{cookies} );
-    $app->sessions->default_expiration( 3600 * 24 * $conf->{confirm} );
-    $app->stash( user => $conf );
+    $app->sessions->default_expiration( $conf->{expiration} );
     
     # Run on any request!
     $app->hook( before_dispatch => sub {
@@ -34,8 +43,7 @@ sub register {
     });
     
     $app->helper( user => sub { $user } );
-    
-    $app->stash( salt => $conf->{salt} );
+    $app->plugin('captcha');
     
     # Routes
     my $r = $app->routes->route('/user')->to( namespace => 'Mojolicious::Plugin::User::Controller' );

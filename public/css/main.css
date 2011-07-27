@@ -7,6 +7,12 @@
  * the terms of the Artistic License version 2.0.
  */
 
+/**********************
+* For HTML5 slowpokes *
+**********************/
+
+nav, header, article, footer { display: block; }
+
 html {
   padding:0px;
   margin:0px;
@@ -17,22 +23,27 @@ html {
   background: -moz-linear-gradient(top,  #5699A9,  #ffffff); /* for firefox 3.6+ */
   background-repeat: no-repeat;
 }
+
 body {
-  padding:0px;
-  margin:0px;
-  height:120%;
-  width:100%;
-  font-family: Sans-Serif,'Lucida Grande';
-  color:#444;
-  font-size: 14px;
-  background: url('/img/mojolicious-clouds.png') no-repeat 0% 0%;
+    padding:0px;
+    margin:0px;
+    height:120%;
+    width:100%;
+    font-family:Sans;
+    color:#444;
+    font-size: 14px;
+    background: url('/img/mojolicious-clouds.png') no-repeat 100% 0%;
 }
+
 a { color: #c62; }
+
 img { border:0px; }
+
 h1,h2,h3,h4,h5,h6 {
     padding-top:0px;
     margin-top:0px;
 }
+
 body nav select {    
     font-size:14px;
     margin-left:10px;
@@ -47,11 +58,73 @@ pre {
 	word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
-/**********************
-* For HTML5 slowpokes *
-**********************/
+/**
+*   Horizontal navigation (1st level)
+*/
 
-nav, header, article, footer { display: block; }
+nav.horizontal {
+    width:600px;
+    margin:0px auto;
+    padding:0px 10px 0px 10px;
+}
+
+nav.horizontal div {
+	border: 1px solid #fff;
+	-moz-border-radius:10px 10px 0px 0px;
+	-webkit-border-radius:10px 10px 0px 0px;
+	border-radius:10px 10px 0px 0px;
+	-khtml-border-radius:10px 10px 0px 0px;
+	background:#F2F3F7;
+    font-size:18px;
+	padding:5px 5px 0px 0px;
+	text-align:center;
+	width:80px;
+	margin:0px 5px 0px 5px;
+  	border-bottom:0px;
+}
+
+/**
+*   Vertical navigation (2nd level)
+*/
+
+nav.vertical {
+    position:absolute;
+    right:50%;
+    top:140px;
+	text-align:left;
+    width:103px;
+}
+
+nav.vertical div {
+  	border: 1px solid #fff;
+  	border-right:0px;
+	-moz-border-radius:10px 0px 0px 10px;
+	-webkit-border-radius:10px 0px 0px 10px;
+	border-radius:10px 0px 0px 10px;
+	-khtml-border-radius:10px 0px 0px 10px;
+    background:#F2F3F7;
+    /*height:24px;*/
+    font-size:18px;
+    padding:5px 5px 5px 10px;
+    width:103px;
+    overflow:hidden;
+	margin:5px 0px 5px 0px;
+	float:left;
+}
+
+nav.vertical div.save {
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	border-radius:10px;
+	-khtml-border-radius:10px;
+	width:80px;
+	text-align:center;
+	padding:5px;
+}
+
+nav.vertical div.selected {
+    background:#fff;
+}
 
 /*** forms ***/
 
@@ -70,14 +143,6 @@ nav, header, article, footer { display: block; }
 
 /*** navigation ***/
 
-nav {
-  position:absolute; top:0px; left:0px;
-  width:100%;
-/*  border-bottom:1px solid #a49e97;  */
-  padding: 4px 0px 3px 0px;
-	height:22px;
-}
-
 nav a {
     color: #222;
     text-decoration:none;
@@ -95,13 +160,9 @@ nav a.rounded {
 	border: 1px solid #e8e8e8;
 }
 
-nav div {
-    padding:0px;
-}
-
 body header {
     width:600px;
-    margin:30px auto;
+    margin:30px auto 10px auto;
 }
 
 /*** Threads ***/
@@ -222,7 +283,7 @@ article.page td {
 }
 
 article.page {
-	margin:10px auto;
+	margin:0px auto;
 	padding:10px 10px 0px 10px;
 	width:600px;
 	height:100%;

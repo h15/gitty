@@ -5,9 +5,17 @@ use MIME::Lite;
 our $VERSION = '0.1';
 
 sub register {
-    my ( $plugin, $app, $conf ) = @_;
+    my ( $plugin, $app ) = @_;
     
-    $app->fatal('Config must be defined.') unless defined %$conf;
+    unless( $app->config('gitosis') )
+    {
+        $app->config ( mail => {
+            from => 'no-reply@lorcode.org',
+            site => 'http://lorcode.org:80',
+        });
+    }
+    
+    my $conf = $app->config('gitosis');
     
     $app->helper( mail => sub {
         my ( $self, $type, $mail, $title, $data ) = @_;

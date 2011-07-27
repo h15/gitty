@@ -1,4 +1,6 @@
 % extends 'base';
+% my $columns = stash('columns');
+% my $models  = stash('models');
 
 % content_for header => begin
     <%= param('id') %>
@@ -33,4 +35,10 @@
     <input type=submit onClick="document.location='<%= url_for('mojo_m_row_form', id => param('id')) %>'" class="alignright">
 </div>
 
+% end
+
+% content_for footer => begin
+% end
+
+% content_for nav => begin
 % end

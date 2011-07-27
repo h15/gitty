@@ -1,0 +1,46 @@
+% languages 'ru';
+% use Mojo::Util qw/camelize/;
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        %= stylesheet '/css/main.css'
+        %= javascript 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js'
+        %= javascript '/js/main.js'
+    </head>
+
+    <body id=body><a name=top></a>
+        <header>
+%= content_for 'header';
+        </header>
+        
+        <nav class=horizontal>
+        
+    % for my $c ( sort keys %{ config('hot_plug') } ) {
+            
+            <div>
+
+        %= camelize $c
+
+            </div>
+
+    % }
+    
+        </nav>
+
+        <nav class=vertical>
+%= content_for 'vertical_nav';
+        </nav>
+
+        <article class=page>
+%= content_for 'body';
+        </article>
+        <footer>
+            <a href="#top" class="alignleft"><%=l 'top' %></a>
+            <div class="aligncenter">
+                Thanks for using Gitty.
+            </div>
+        </footer>
+    </body>
+</html>

@@ -6,6 +6,15 @@ use Mojolicious::Plugin::Gitosis::EasyConfig;
 sub register {
     my ( $self, $app, $conf ) = @_;
     
+    unless( $app->config('gitosis') )
+    {
+        $app->config ( gitosis => {
+            git_home => '/home/user/gitosis-admin/',
+        });
+    }
+    
+    my $conf = $app->config('gitosis');
+    
     my $git_conf = new Mojolicious::Plugin::Gitosis::EasyConfig({
         file => $conf->{git_home} . 'gitosis.conf'
     });
