@@ -29,6 +29,10 @@ sub read_extended {
 
 sub create {
     my $self = shift;
+    my $conf = $self->config('user');
+    
+    return $self->error('Registration disabled')
+           unless $conf->{enable_registration} || $self->user->is_admin;
     
     return $self->error('CAPTCHA test failed.') unless $self->captcha;
     

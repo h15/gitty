@@ -1,15 +1,18 @@
 % languages 'ru';
+% use Mojo::Util qw/camelize/;
+
 <!doctype html>
-<html lang=ru>
+<html>
     <head>
+        <meta charset="utf-8">
         %= stylesheet '/css/main.css'
         %= javascript 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js'
         %= javascript '/js/main.js'
-        <meta charset=utf-8>
     </head>
-    <body id=body>
+
+    <body id=body><a name=top></a>
 %= include 'hidden_forms'
-        <nav>
+        <nav class=top>
             <select onChange="document.location = this.value">
                 <option selected style="display:none"> Git
                 <option value="<%= url_for('gits_index') %>">          <%=l 'Repos' %>
@@ -24,6 +27,7 @@
                 <select onChange="this.value[0] == '/' ? document.location = this.value : hide(this.value);">
                     <option selected style="display:none">                      <%=l 'Admin' %>
                     <option value="<%= url_for('mojo_m_list') %>">             <%=l 'Data Base' %>
+                    <option value="<%= url_for('config_index') %>">             <%=l 'Configs' %>
                 </select>
             % }
             
@@ -41,12 +45,24 @@
             </div>
         </nav>
         <header>
-            <h1>
-%= content_for 'header'
-            </h1>
+        <h1>
+%= content_for 'header';
+        </h1>
         </header>
+        
+
+        <nav class=vertical>
+%= content_for 'vertical_nav';
+        </nav>
+
         <article class=page>
-%= content_for 'body'
+%= content_for 'body';
         </article>
+        <footer>
+            <a href="#top" class="alignleft"><%=l 'top' %></a>
+            <div class="aligncenter">
+                Thanks for using Gitty.
+            </div>
+        </footer>
     </body>
 </html>

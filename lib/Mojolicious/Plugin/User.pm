@@ -14,12 +14,13 @@ sub register {
             cookies => 'some random string',
             expiration => 3600 * 24,
             salt => 'some random string',
+            enable_registration => 1,
         });
     }
+    my $conf = $app->config('user');
     
     $app->model('User')->init;
     
-    my $conf = $app->config('user');
     my $user = $app->model('User')->find(id => 1);
     
     $app->secret( $conf->{cookies} );

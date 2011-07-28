@@ -26,7 +26,7 @@ html {
 
 body {
     padding:0px;
-    margin:0px;
+    margin:10px 0px 0px 0px;
     height:120%;
     width:100%;
     font-family:Sans;
@@ -142,6 +142,15 @@ nav.vertical div.selected {
 }
 
 /*** navigation ***/
+
+nav.top {
+    position:absolute;
+    top:0px;
+    left:0px;
+    width:100%;
+    padding:5px 0px 0px 0px;
+    margin:0px;
+}
 
 nav a {
     color: #222;

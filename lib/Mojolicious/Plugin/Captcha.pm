@@ -7,6 +7,15 @@ our $VERSION = '0.1';
 sub register {
 	my ( $self, $app ) = @_;
 	
+	unless( $app->config('captcha') )
+    {
+        $app->config ( captcha => {
+            disable => 0,
+        });
+    }
+    
+    my $conf = $app->config('captcha');
+	
 	# for example
 	my @questions = (
 	    [ 'q'  , 'a'   ],
@@ -16,6 +25,8 @@ sub register {
 	
 	$app->renderer->add_helper(
 		captcha_html => sub {
+		    return if $conf->{disable};
+		    
 			my $self = shift;
 			my $id   = int rand(@questions);
 			
@@ -28,6 +39,8 @@ sub register {
 	);
 	$app->renderer->add_helper(
 		captcha => sub {
+		    return 1 if $conf->{disable};
+		    
 			my $self = shift;
 			my $id = $self->session('captcha');
 			

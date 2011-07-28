@@ -4,12 +4,14 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojolicious::Plugin::Gitosis::EasyConfig;
 
 sub register {
-    my ( $self, $app, $conf ) = @_;
+    my ( $self, $app ) = @_;
     
     unless( $app->config('gitosis') )
     {
         $app->config ( gitosis => {
             git_home => '/home/user/gitosis-admin/',
+            allow_empty_description => 0,
+            group_is_repo => 1,
         });
     }
     
