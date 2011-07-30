@@ -1,37 +1,34 @@
-% my $captcha = captcha_html;
-<form method=post action="<%= url_for('auths_login') %>" id=login_form class="hidden popup">
-    <a href="#" onClick="hide();return false;" class=close><img src="/img/close.png" alt='x'></a>
-    <table class="aligncenter rounded">
-        <tr>
-            <td>
-                <%=l 'e-mail' %>
-            </td>
-            <td>
-                <input name=mail class=alignright>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <%=l 'password' %>
-            </td>
-            <td>
-                <input type=password name=passwd>
-            </td>
-        </tr>
-        <tr>
-            <td colspan=2 class=captcha>
-                <%= $captcha %>
-            </td>
-        </tr>
-        <tr>
-            <td>
-            </td>
-            <td>
-                <input type=submit class="alignright" value="<%=l 'Login' %>">
-            </td>
-        </tr>
-    </table>
-</form>
+<%
+    form (
+        login => {
+            action  => url_for('auths_login'),
+            method  => 'post',
+            submit  => 'Send',
+            
+            'e-mail'    => {
+                require     => 1,
+                type        => 'text',
+                value       => 'Gitty user',
+                validators  =>
+                {
+                    letters => 1,
+                    length  => [3,20],
+                }
+            },
+            
+            'password'  => {
+                require     => 1,
+                type        => 'password',
+                validators  => { length => [8,20] }
+            }
+        }
+    );
+%>
+
+<div id=login_form class="hidden popup">
+<a href="#" onClick="hide();return false;" class=close><img src="/img/close.png" alt='x'></a>
+%= form('login');
+</div>
 
 <form method=post action="<%= url_for('auths_mail_request') %>" id=login_via_mail class="hidden popup">
     <a href="#" onClick="hide();return false;" class=close><img src="/img/close.png" alt='x'></a>
@@ -46,7 +43,7 @@
         </tr>
         <tr>
             <td colspan=2 class=captcha>
-                <%= $captcha %>
+                <%=# $captcha %>
             </td>
         </tr>
         <tr>
@@ -72,7 +69,7 @@
         </tr>
         <tr>
             <td colspan=2 class=captcha>
-                <%= $captcha %>
+                <%=# $captcha %>
             </td>
         </tr>
         <tr>

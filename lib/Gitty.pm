@@ -7,6 +7,7 @@ sub startup {
 
     $app->plugin('i18n');
     $app->plugin('message');
+    $app->plugin('form');
     $app->plugin('config');
     $app->plugin('gitosis');
     
