@@ -68,3 +68,6 @@ function addValue(id, val) {
     a.value = Number(a.value) + Number(val);
     return false;
 }
+
+/* Check forms */
+var elements = new Array();

@@ -46,6 +46,7 @@ sub register {
             );
             
             $self->render(template => "message/$template");
+            $self->rendered(200);
         }
     );
 }
