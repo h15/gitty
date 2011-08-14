@@ -4,12 +4,27 @@ use Mojo::Base 'Mojolicious';
 # This method will run once at server start
 sub startup {
     my $app = shift;
+    $main::app = $app;
 
     $app->plugin('i18n');
     $app->plugin('message');
     $app->plugin('form');
     $app->plugin('config');
     $app->plugin('gitosis');
+    
+    #
+    #   Auto Loader
+    #
+    for my $path ( <./lib/Mojolicious/Plugin/Form/*> )
+    {
+        my @way = split '/', $path;
+           $way[-1] =~ s/\.pm$//;
+           
+        my $pack = join '::', @way[2..$#way];
+        
+        eval "require $pack";
+        $pack->new($app);
+    }
     
     $app->helper (
         is => sub {

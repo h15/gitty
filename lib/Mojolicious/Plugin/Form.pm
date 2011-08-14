@@ -23,17 +23,6 @@ sub register
                 return $class->_set($name, $val);
             }
         );
-        
-        for my $path ( <./lib/Mojolicious/Plugin/Form/*> )
-        {
-            my @way = split '/', $path;
-               $way[-1] =~ s/\.pm$//;
-               
-            my $pack = join '::', @way[2..$#way];
-            
-            eval "require $pack";
-            $pack->new($app);
-        }
     }
 
 =head1 Mojolicious::Plugin::Form::Class
@@ -103,7 +92,11 @@ sub get
         # Form does not exist
         # - still worse than we thought.
         
-        return $self->app->error() unless exists $self->forms->{$name};
+        unless ( exists $self->forms->{$name} )
+        {
+            $main::app->error('Some internal error');
+            return 0;
+        }
         
         my $form = $self->forms->{$name};
         
@@ -118,14 +111,14 @@ sub get
         # Resistance is futile !!!
         
         my %data;
-        die $self->app->dumper($form);
+        
         for my $e ( $form->{fields} )
         {
-            $data{ $e } = $self->app->param("$name-$e");
+            $data{ $e } = $main::app->param("$name-$e");
             
             unless ( $self->_validElement($name, $e, $data{ $e }) )
             {
-                return $self->app->error
+                return $main::app->error
                     ( 'Wrong input param ' . $form->{$e}->{label} );
             }
         }

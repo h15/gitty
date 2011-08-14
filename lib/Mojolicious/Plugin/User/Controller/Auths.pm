@@ -9,7 +9,11 @@ sub login
     {
         # Prepare data
 	    my $self = shift;
-	    my $data = $self->form->get('login');
+	    
+	    # Validation and get.
+	    my $data = $self->form->get('login')
+	             | return $self->redirect_to('auths_form');
+	    
 	    my ( $mail, $password ) = @{ $data->{qw/mail passwd/} };
 	
 	    # Does it exist?
@@ -17,7 +21,7 @@ sub login
 	    {
 	        return $self->error("This pair(e-mail and password) doesn't exist!");
 	    }
-	
+	    
 	    my $user = $self->model('User')->find( mail => $mail );
         
         # Password test
