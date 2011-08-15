@@ -1,16 +1,16 @@
-package Mojolicious::Plugin::Form::Login;
+package Mojolicious::Plugin::Form::MailRequest;
 
 sub new
     {
         my ( $self, $app ) = @_;
         
         $app->form (
-            login => {
-                action  => $app->url_for('auths_login'),
+            mail_request => {
+                action  => $app->url_for('auths_mail_form'),
                 method  => 'post',
                 submit  => 'Send',
                 
-                fields  => [qw/e-mail password/],
+                fields  => [qw/e-mail/],
                 
                 'e-mail'    => {
                     label       => 'E-mail:',
@@ -22,13 +22,6 @@ sub new
                         length  => [3,20],
                         like    => qr/[\w\d\-_.]+\@[\w\d\-_.]+\.\w+/,
                     }
-                },
-                
-                'password'  => {
-                    label       => 'Password:',
-                    require     => 1,
-                    type        => 'password',
-                    validators  => { length => [8,20] }
                 }
             }
         );

@@ -1,18 +1,18 @@
-package Mojolicious::Plugin::Form::Login;
+package Mojolicious::Plugin::Form::UserCreate;
 
 sub new
     {
         my ( $self, $app ) = @_;
         
         $app->form (
-            login => {
-                action  => $app->url_for('auths_login'),
+            user_create => {
+                action  => $app->url_for('users_create'),
                 method  => 'post',
                 submit  => 'Send',
                 
-                fields  => [qw/e-mail password/],
+                fields  => [qw/mail/],
                 
-                'e-mail'    => {
+                'mail'    => {
                     label       => 'E-mail:',
                     require     => 1,
                     type        => 'text',
@@ -22,13 +22,6 @@ sub new
                         length  => [3,20],
                         like    => qr/[\w\d\-_.]+\@[\w\d\-_.]+\.\w+/,
                     }
-                },
-                
-                'password'  => {
-                    label       => 'Password:',
-                    require     => 1,
-                    type        => 'password',
-                    validators  => { length => [8,20] }
                 }
             }
         );

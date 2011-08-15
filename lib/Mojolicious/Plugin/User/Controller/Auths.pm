@@ -7,16 +7,19 @@ use Mojo::Base 'Mojolicious::Controller';
 
 sub login
     {
-        # Prepare data
 	    my $self = shift;
 	    
-	    # Validation and get.
-	    my $data = $self->form->get('login')
-	             | return $self->redirect_to('auths_form');
+	    # If validation failed
+	    # - show login form and get out here!
+	    
+	    my $data = $self->form->get('login') || return $self->redirect_to('auths_form');
+	    
+	    # else
+	    # - get data and go ahead.
 	    
 	    my ( $mail, $password ) = @{ $data->{qw/mail passwd/} };
-	
-	    # Does it exist?
+	    
+	    # Does user exist?
 	    unless ( $self->model('User')->exists(mail => $mail) )
 	    {
 	        return $self->error("This pair(e-mail and password) doesn't exist!");
@@ -50,18 +53,17 @@ sub mail_request
     {
         my $self = shift;
         
-        return $self->error('CAPTCHA test failed.') unless $self->captcha;
-        
-	    $self->IS( mail => $self->param('mail') );
+	    # Validation and get.
+	    my $data = $self->form->get('mail_request') || return $self->redirect_to('auths_mail_form');
 	
 	    # Does it exist?
 	    unless ( $self->model('User')->exists(mail => $self->param('mail')) )
 	    {
-	        return $self->error( "This e-mail doesn't exist in data base!" );
+	        return $self->error( "This e-mail doesn't exist in data base" );
 	    }
 	
 	    my $confirm_key = Digest::MD5::md5_hex(rand);
-	
+	    
 	    my $user = $self->model('User')->find( mail => $self->param('mail') );
            $user->confirm_key($confirm_key);
            $user->confirm_time( time + 86400 );
@@ -73,7 +75,7 @@ sub mail_request
             { key  => $confirm_key, mail => $self->param('mail') }
         );
         
-        return $self->done('Check your mail.');
+        return $self->done('Check your mail');
     }
 
 sub mail_confirm
@@ -84,12 +86,10 @@ sub mail_confirm
 	    # Does it exist?
 	    unless ( $self->model('User')->exists(mail => $self->param('mail')) )
 	    {
-	        return $self->error('Auth failed!');
+	        return $self->error('Auth failed');
 	    }
 	
 	    my $user = $self->model('User')->find(mail => $mail);
-        
-        my $cfg = $self->stash('user');
         
         if ( $user->confirm_key eq '' )
         {

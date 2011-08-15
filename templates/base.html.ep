@@ -26,7 +26,7 @@
             % if ( user->is_admin ) {
                 <select onChange="this.value[0] == '/' ? document.location = this.value : hide(this.value);">
                     <option selected style="display:none">                      <%=l 'Admin' %>
-                    <option value="<%= url_for('mojo_m_list') %>">             <%=l 'Data Base' %>
+                    <option value="<%= url_for('mojo_m_list') %>">              <%=l 'Data Base' %>
                     <option value="<%= url_for('config_index') %>">             <%=l 'Configs' %>
                 </select>
             % }

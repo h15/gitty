@@ -13,6 +13,21 @@ sub register
         my ( $self, $app ) = @_;
         my $class = Mojolicious::Plugin::Form::Class->new($app);
         
+        $app->hook (
+            before_dispatch => sub
+            {
+                my $self = shift;
+                my %data;
+                
+                for my $p ( $self->param() )
+                {
+                    $data{$p} = $self->param($p);
+                }
+                
+                $class->set_data(\%data);
+            }
+        );
+        
         $app->helper (
             form => sub
             {
@@ -46,7 +61,6 @@ Class for Form base functions.
                 value       => 'Gitty user',
                 validators  =>
                 {
-                    letters => 1,
                     length  => [3,20],
                 }
             },
@@ -71,18 +85,24 @@ use Mojo::ByteStream;
 
     has forms => sub { {} };    # All forms will be store here.
     has app   => undef;         # Need for error helper.
+    has data  => sub { {} };
 
 sub new
     {
         my ( $self, $app ) = @_;
-        $self->app($app);
-        $self->SUPER::new;
+             $self->SUPER::new;
+             $self->app($app);
     }
 
 sub _set
     {
         my ( $self, $name, $val ) = @_;
         $self->forms({ %{ $self->forms }, $name => $val });
+    }
+    
+sub set_data
+    {
+        shift->data(shift);
     }
 
 sub get
@@ -94,7 +114,7 @@ sub get
         
         unless ( exists $self->forms->{$name} )
         {
-            $main::app->error('Some internal error');
+            $self->app->error('Some internal error');
             return 0;
         }
         
@@ -112,14 +132,15 @@ sub get
         
         my %data;
         
-        for my $e ( $form->{fields} )
+        for my $e ( @{ $form->{fields} } )
         {
-            $data{ $e } = $main::app->param("$name-$e");
+            $data{ $e } = $self->data->{"$name-$e"};
             
             unless ( $self->_validElement($name, $e, $data{ $e }) )
             {
-                return $main::app->error
-                    ( 'Wrong input param ' . $form->{$e}->{label} );
+                $self->app->error( 'Wrong input param ' . $form->{$e}->{label} );
+                
+                return 0;
             }
         }
         
@@ -147,13 +168,13 @@ sub _validElement
                 when('like')
                 {
                     my $regexp = $v->{'like'};
-                    return 0 unless $val =~ m/^$regexp$/;
+                    return 0 unless $val =~ /^$regexp$/;
                     break;
                 }
                 
                 when('length')
                 {
-                    my ( $min, $max ) = $v->{'length'};
+                    my ( $min, $max ) = @{ $v->{'length'} };
                     return 0 if $min > length $val || $max < length $val;
                     break;
                 }
@@ -236,6 +257,24 @@ sub render
                             </dl>
                         ],
                         $val->{label}, "$name-$key", $min, $max, $require, $value
+                    );
+                    break;
+                }
+                
+                when( 'datetime' )
+                {
+                    $result .= sprintf (
+                        qq[
+                            <dl>
+                                <dt>
+                                    %s
+                                </dt>
+                                <dd>
+                                    <textarea name='%s' onLoad="addToCheck(document.this,null,null,%s)">%s</textarea>
+                                </dd>
+                            </dl>
+                        ],
+                        $val->{label}, "$name-$key", $require, $value
                     );
                     break;
                 }

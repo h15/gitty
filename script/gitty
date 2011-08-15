@@ -20,6 +20,9 @@ EOF
 
 # ./script/joke install host=localhost driver=mysql database=gitty \
 # username=gitty password=secret
+
+mkdir './lib/Mojolicious/Plugin/Config/';
+
 if ( $ARGV[0] eq 'install' )
 {
     my %conf;
