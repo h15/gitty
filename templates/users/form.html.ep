@@ -13,28 +13,7 @@
 % end
 
 <%= content body => begin %>
-    <form method=post action="<%= url_for('users_create') %>">
-	    <table class="aligncenter rounded">
-	        <tr>
-	            <td>
-	                <%=l 'e-mail' %>
-	            </td>
-	            <td>
-	                <input name=mail class=alignright>
-	            </td>
-	        </tr>
-	        <tr>
-	            <td colspan=2>
-	                <%= captcha_html %>
-	            </td>
-	        </tr>
-	        <tr>
-	            <td>
-	            </td>
-	            <td>
-	                <input type=submit class="alignright">
-	            </td>
-	        </tr>
-	    </table>
-	</form>
+    
+    <%= form('user_create') %>
+    
 <% end %>
