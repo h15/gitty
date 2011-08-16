@@ -10,9 +10,9 @@ sub new
                 method  => 'post',
                 submit  => 'Send',
                 
-                fields  => [qw/e-mail password/],
+                fields  => [qw/mail password/],
                 
-                'e-mail'    => {
+                'mail'    => {
                     label       => 'E-mail:',
                     require     => 1,
                     type        => 'text',

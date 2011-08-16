@@ -6,12 +6,12 @@ sub read
         my $self = shift;
         
 	    # Does it exist?
-	    unless ( $self->model('User')->exists(id => $self->stash('id')) )
+	    unless ( $self->model('User')->exists(id => $self->param('id')) )
 	    {
 	        return $self->error("User with this id doesn't exist!");
 	    }
         
-	    my $user = $self->model('User')->find(id => $self->stash('id'));
+	    my $user = $self->model('User')->find(id => $self->param('id'));
         
         # not Anonymous ( and Self or Admin )
         if ( $self->user->id != 1 && ( $self->param('id') == $self->user->id || $self->user->is_admin ) )
@@ -76,27 +76,35 @@ sub create
         return $self->done('Check your mail.');
     }
 
-sub update {
-    my $self = shift;
-    
-    # Can change?
-    unless ( $self->user->id != 1 && ( $self->param('id') == $self->user->id || $self->user->is_admin ) ) {
-        return $self->error("Permission denied!");
-    }
-    
-    # Does it exist?
-	unless ( $self->model('User')->exists(id => $self->param('id')) ) {
-	    return $self->error("User with this id doesn't exist!");
-	}
+sub update
+    {
+        my $self = shift;
         
-    my $data = $self->form->get('user_update') || return $self->redirect_to('users_read');
-    
-    my $user = $self->model('User')->find(id => $self->param('id'));
-       $user->$_( $data->{$_} ) for qw/name mail ban_time ban_reason/;
-       $user->save;
-    
-    $self->redirect_to( 'users_read', id => $self->stash('id') );
-}
+        # Can change?
+        unless ( $self->user->id != 1 && ( $self->param('id') == $self->user->id || $self->user->is_admin ) )
+        {
+            return $self->error("Permission denied!");
+        }
+        
+        # Does it exist?
+	    unless ( $self->model('User')->exists(id => $self->param('id')) ) {
+	        return $self->error("User with this id doesn't exist!");
+	    }
+        
+        my $data = $self->form->get('user_update') ||
+            return $self->redirect_to( 'users_read', id => $self->param('id') );
+        
+        my $user = $self->model('User')->find(id => $self->param('id'));
+        
+        for ( qw/name mail ban_time ban_reason/ )
+        {
+           $user->$_( $data->{$_} ) if $data->{$_};
+        }
+        
+        $user->save;
+        
+        $self->redirect_to( 'users_read', id => $self->stash('id') );
+    }
 
 1;
 

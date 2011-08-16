@@ -57,22 +57,22 @@ sub mail_request
 	    my $data = $self->form->get('mail_request') || return $self->redirect_to('auths_mail_form');
 	
 	    # Does it exist?
-	    unless ( $self->model('User')->exists(mail => $self->param('mail')) )
+	    unless ( $self->model('User')->exists(mail => $data->{'mail'}) )
 	    {
 	        return $self->error( "This e-mail doesn't exist in data base" );
 	    }
 	
 	    my $confirm_key = Digest::MD5::md5_hex(rand);
 	    
-	    my $user = $self->model('User')->find( mail => $self->param('mail') );
+	    my $user = $self->model('User')->find( mail => $data->{'mail'} );
            $user->confirm_key($confirm_key);
            $user->confirm_time( time + 86400 );
            $user->save;
         
         # Send mail
         $self->mail( confirm =>
-            $self->param('mail'), 'Change password',
-            { key  => $confirm_key, mail => $self->param('mail') }
+            $data->{'mail'}, 'Change password',
+            { key  => $confirm_key, mail => $data->{'mail'} }
         );
         
         return $self->done('Check your mail');

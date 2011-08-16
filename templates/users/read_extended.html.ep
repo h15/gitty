@@ -16,80 +16,16 @@
 %= content body => begin
 <div class="ucp">
     <div class="rounded">
-<form method=post action=<%= url_for('users_update', id => $user->{'id'} ) %>>
-    <table class="user_fields" rules=rows>
-        <tr>
-            <td class=fields><%=l 'name' %></td>
-            <td>
-% unless ( defined $user->{'name'} ) {
-            <input name=name>
-% } else {
-            <%= $user->{'name'} %>
-% }
-            </td>
-        </tr><tr>
-            <td colspan=2>
-                <a href="#" onClick="hide('pass_fields')">
-                    <%=l 'change password' %>
-                </a>
-                <table id="pass_fields" class="hidden">
-                    <tr>
-                        <td><%=l 'password' %></td>
-                        <td><input name=pass type=password></td>
-                    </tr>
-                    <tr>
-                        <td><%=l 'repeat' %></td>
-                        <td><input name=pass2 type=password></td>
-                    </tr>
-                </table>
-            </td>
-        </tr><tr>
-            <td><%=l 'mail' %></td>
-            <td><input name=mail value="<%= $user->{'mail'} %>"></td>
-        </tr><tr>
-            <td><%=l 'registered' %></td>
-            <td><%=render_datetime $user->{'regdate'} %></td>
-        </tr><tr>
-            <td><%=l 'ban reason' %></td>
-            <td>
-                <input name=ban_reason value="<%= $user->{'ban_reason'} %>">
-            </td>
-        </tr><tr>
-            <td colspan=2>
-                <a href="#" onClick="hide('ban_fields')">
-                    <%=l 'ban options' %>
-                </a>
-                <table id=ban_fields class=hidden>
-                    <tr>
-                        <td><%=l 'ban time' %></td>
-                        <td>
-                            <input name=ban_time id=ban_time value="<%= $user->{'ban_time'} eq '' ? $user->{'ban_time'} : time %>">
-                        </td>
-                    </tr><tr>
-                        <td><%=l 'now' %></td>
-                        <td>
-                            <%= $user->{'ban_time'} ? render_datetime $user->{'ban_time'} : l 'permanent' %>
-                        </td>
-                    </tr><tr>
-                        <td colspan=2>
-                            <%=l 'Add' %>:
-                            <a href="#" onClick="addValue('ban_time', 60*60)"><%=l 'hour' %></a>,
-                            <a href="#" onClick="addValue('ban_time', 60*60*24)"><%=l 'day' %></a>,
-                            <a href="#" onClick="addValue('ban_time', 60*60*24*7)"><%=l 'week' %></a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr><tr>
-            <td><%=l 'status' %></td>
-            <td><%=l $user->{'ban_reason'}? 'inactive':'active' %></td>
-        </tr><tr>
-            <td colspan=2>
-                <input type=submit>
-            </td>
-        </tr>
-    </table>
-</form>
+    
+<%=
+    form->render( user_update => {
+        name => $user->{'name'},
+        mail => $user->{'mail'},
+        ban_time => render_iso_datetime( $user->{'ban_time'} ),
+        ban_reason => $user->{'ban_reason'}
+    })
+%>
+
     </div>
 </div>
 % end

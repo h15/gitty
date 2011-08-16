@@ -6,23 +6,23 @@ sub new
         
         $app->form (
             user_update => {
-                action  => $app->url_for('users_update'),
+                action  => $app->url_for( 'users_update', id => $app->param('id') ),
                 method  => 'post',
                 submit  => 'Send',
                 
                 fields  => [qw/name mail ban_time ban_reason/],
                 
-                'name'  => {
+                name => {
                     label       => 'Name:',
                     type        => 'text',
                     validators  =>
                     {
                         length  => [3,20],
-                        like    => qr/[a-zа-яё0-9]/i,
+                        like    => qr/[a-zа-яё0-9]+/i,
                     }
                 },
                 
-                'mail'  => {
+                mail => {
                     label       => 'E-mail:',
                     type        => 'text',
                     validators  =>
@@ -32,8 +32,8 @@ sub new
                     }
                 },
                 
-                'ban_time' => {
-                    label       => 'Ban time',
+                ban_time => {
+                    label       => 'Ban time:',
                     type        => 'datetime',
                     validators  =>
                     {
@@ -41,7 +41,7 @@ sub new
                     }
                 },
                 
-                'ban_reason' => {
+                ban_reason => {
                     label       => 'Ban reason:',
                     type        => 'text',
                     validators  =>

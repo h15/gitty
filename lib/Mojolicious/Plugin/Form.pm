@@ -13,6 +13,9 @@ sub register
         my ( $self, $app ) = @_;
         my $class = Mojolicious::Plugin::Form::Class->new($app);
         
+        # Get data from request (GET, POST).
+        # Refresh on each request.
+
         $app->hook (
             before_dispatch => sub
             {
@@ -27,6 +30,9 @@ sub register
                 $class->set_data(\%data);
             }
         );
+        
+        # Mojolicious::Plugin::Form::Class interface.
+        # Set, Render and get Class.
         
         $app->helper (
             form => sub
@@ -153,7 +159,8 @@ sub _validElement
         my $form = $self->forms->{$name};
         
         # Require.
-        return 0 if $form->{$e}->{require} && $val eq '';
+        return 0 if   $form->{$e}->{require} && $val eq '';
+        return 1 if ! $form->{$e}->{require} && $val eq '';
         
         # Validators.
         return 1 unless defined $form->{$e}->{validators};
@@ -186,7 +193,7 @@ sub _validElement
 
 sub render
     {
-        my ( $self, $name ) = @_;
+        my ( $self, $name, $values ) = @_;
         my $form = $self->forms->{$name};
         my $result;
         
@@ -202,6 +209,7 @@ sub render
             # is required, get default value
             my $require = defined $val->{require} && $val->{require} != 0 ? 'true' : 'false';
             my $value   = defined $val->{value}   ?  $val->{value} : '';
+               $value ||= $values->{$key};
             
             given( $val->{type} )
             {
@@ -221,6 +229,7 @@ sub render
                         ],
                         $val->{label}, "$name-$key", $value, $min, $max, $require
                     );
+                    
                     break;
                 }
                 
@@ -240,6 +249,7 @@ sub render
                         ],
                         $val->{label}, "$name-$key", $value, $min, $max, $require
                     );
+                    
                     break;
                 }
                 
@@ -258,6 +268,7 @@ sub render
                         ],
                         $val->{label}, "$name-$key", $min, $max, $require, $value
                     );
+                    
                     break;
                 }
                 
@@ -270,12 +281,13 @@ sub render
                                     %s
                                 </dt>
                                 <dd>
-                                    <textarea name='%s' onLoad="addToCheck(document.this,null,null,%s)">%s</textarea>
+                                    <input name='%s' onLoad="addToCheck(document.this,null,null,%s)" value='%s'>
                                 </dd>
                             </dl>
                         ],
                         $val->{label}, "$name-$key", $require, $value
                     );
+                    
                     break;
                 }
                 

@@ -77,7 +77,7 @@ sub register
         $r->route('/:id', id => qr/\d+/)->via('get')->to('users#read')->name('users_read');
         
         # Update
-        $r->route('/:id', id => qr/\d+/)->via('post'  )->to('users#update')->name('users_update');
+        $r->route('/:id', id => qr/\d+/)->via('post')->to('users#update')->name('users_update');
         
         # Delete
         $r->route('/:id', id => qr/\d+/)->via('delete')->to('users#delete')->name('users_delete');
