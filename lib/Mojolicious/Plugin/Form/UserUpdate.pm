@@ -1,4 +1,5 @@
 package Mojolicious::Plugin::Form::UserUpdate;
+use Date::Parse;
 
 sub new
     {
@@ -35,9 +36,15 @@ sub new
                 ban_time => {
                     label       => 'Ban time:',
                     type        => 'datetime',
+                    
                     validators  =>
                     {
                         like    => qr/\d+-\d+-\d+ \d+:\d+:\d+/,
+                    },
+                    
+                    adaptors    =>
+                    {
+                        strtodate => sub { str2time( shift ) }
                     }
                 },
                 
@@ -46,7 +53,8 @@ sub new
                     type        => 'text',
                     validators  =>
                     {
-                        length  => [1,255],
+                        like    => qr/\d+/,
+                        length  => [1,2],
                     }
                 },
             }

@@ -58,11 +58,11 @@ sub create
         
         my $key = Digest::MD5::md5_hex(rand);
         
-#        $self->mail( confirm =>
-#            $data->{mail},
-#            'Registration',
-#            { key  => $key, mail => $data->{mail} }
-#        );
+        $self->mail( confirm =>
+            $data->{mail},
+            'Registration',
+            { key  => $key, mail => $data->{mail} }
+        );
         
         my $user = $self->model('User')->create (
             mail         => $data->{mail},

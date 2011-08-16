@@ -68,6 +68,10 @@ Class for Form base functions.
                 validators  =>
                 {
                     length  => [3,20],
+                },
+                adaptors    =>
+                {
+                    strtodate => sub { str2time( shift ) }
                 }
             },
             
@@ -142,11 +146,21 @@ sub get
         {
             $data{ $e } = $self->data->{"$name-$e"};
             
+            # Run validation.
             unless ( $self->_validElement($name, $e, $data{ $e }) )
             {
                 $self->app->error( 'Wrong input param ' . $form->{$e}->{label} );
                 
                 return 0;
+            }
+            
+            # Run adapter.
+            if ( defined $form->{$e}->{adaptors} )
+            {
+                for my $a ( keys %{ $form->{$e}->{adaptors} } )
+                {
+                    $data{$e} = $form->{$e}->{adaptors}->{$a}->( $data{$e} );
+                }
             }
         }
         

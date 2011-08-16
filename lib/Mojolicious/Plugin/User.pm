@@ -55,7 +55,9 @@ sub register
         );
         
         $app->helper( user => sub { $user } );
+        
         $app->plugin('captcha');
+        $app->plugin('mail');
         
         #
         #   Routes for user

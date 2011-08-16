@@ -28,11 +28,11 @@ sub startup {
     $app->helper (
         render_iso_datetime => sub {
             my ($self, $val) = @_;
-            my ( $s, $mi, $h, $d, $mo, $y ) = map { $_ < 10 ? "0$_" : $_ } localtime;
+            my ( $s, $mi, $h, $d, $mo, $y ) = map { $_ < 10 ? "0$_" : $_ } localtime($val);
             $mo++;
             $y += 1900;
             
-            return new Mojo::ByteStream ( qq[$y-$mo-$d $h:$mi:${s}] );
+            return new Mojo::ByteStream ( qq[$y-$mo-${d} $h:$mi:${s}] );
         }
     );
     
