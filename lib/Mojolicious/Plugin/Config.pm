@@ -38,10 +38,10 @@ sub register {
     # Routes for admin.
     my $r = $app->routes->route('/admin/config')->to( namespace => 'Mojolicious::Plugin::Config::Controller' );
     my $a = $r->bridge('/')->to( cb => sub { shift->user->is_admin } );
-       $a->route('/'                      )->via('get' )->to('config#index' )->name('config_index' );
-       $a->route('/save/all'              )->via('get' )->to('config#save'  )->name('config_save'  );
-       $a->route('/:name', name => qr/\w+/)->via('get' )->to('config#read'  )->name('config_read'  );
-       $a->route('/:name', name => qr/\w+/)->via('post')->to('config#update')->name('config_update');
+       $a->route('/'                      )->via('get' )->to('configs#index' )->name('config_index' );
+       $a->route('/save/all'              )->via('get' )->to('configs#save'  )->name('config_save'  );
+       $a->route('/:name', name => qr/\w+/)->via('get' )->to('configs#read'  )->name('config_read'  );
+       $a->route('/:name', name => qr/\w+/)->via('post')->to('configs#update')->name('config_update');
     
     $app->config( hot_plug => {
         config => 1

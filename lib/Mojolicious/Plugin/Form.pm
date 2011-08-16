@@ -223,7 +223,7 @@ sub render
             # is required, get default value
             my $require = defined $val->{require} && $val->{require} != 0 ? 'true' : 'false';
             my $value   = defined $val->{value}   ?  $val->{value} : '';
-               $value ||= $values->{$key};
+               $value   = $values->{$key} if defined $values->{$key};
             
             given( $val->{type} )
             {

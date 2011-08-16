@@ -120,6 +120,7 @@ nav.vertical div.save {
 	width:80px;
 	text-align:center;
 	padding:5px;
+    background: #fee;
 }
 
 nav.vertical div.selected {
