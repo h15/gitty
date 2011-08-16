@@ -15,7 +15,7 @@ sub register {
         });
     }
     
-    my $conf = $app->config('gitosis');
+    my $conf = $app->config('mail');
     
     $app->helper( mail => sub {
         my ( $self, $type, $mail, $title, $data ) = @_;

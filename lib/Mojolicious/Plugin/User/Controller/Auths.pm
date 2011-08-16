@@ -17,7 +17,7 @@ sub login
 	    # else
 	    # - get data and go ahead.
 	    
-	    my ( $mail, $password ) = @{ $data->{qw/mail passwd/} };
+	    my ( $mail, $password ) = ( $data->{mail}, $data->{password} );
 	    
 	    # Does user exist?
 	    unless ( $self->model('User')->exists(mail => $mail) )
