@@ -78,7 +78,6 @@ nav.horizontal div {
     font-size:18px;
 	padding:5px 5px 0px 0px;
 	text-align:center;
-	width:80px;
 	margin:0px 5px 0px 5px;
   	border-bottom:0px;
 }
@@ -86,6 +85,41 @@ nav.horizontal div {
 /**
 *   Vertical navigation (2nd level)
 */
+.top div.nav_item ul {
+    display:none;
+    margin:0px;
+    padding:0px;
+    color:#F2F3F7;
+	width:800px;
+}
+
+.top div.nav_item a {
+    display:block;
+    padding:5px;
+}
+
+.top div.nav_item a:hover {
+	background:#fff;
+}
+
+.top div.nav_item ul li {
+    border-top:1px solid #fff;
+    color:#424347;
+    list-style:none;
+}
+
+.top div.nav_item {
+	border: 1px solid #fff;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	-khtml-border-radius:5px;
+	background:#F2F3F7;
+	padding:0px;
+	margin-left:10px;
+	width:120px;
+	overflow:hidden;
+}
 
 nav.vertical {
     position:absolute;

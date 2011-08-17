@@ -13,35 +13,46 @@
     <body id=body><a name=top></a>
 %= include 'hidden_forms'
         <nav class=top>
-            <select onChange="document.location = this.value">
-                <option selected style="display:none"> Git
-                <option value="<%= url_for('gits_index') %>">          <%=l 'Repos' %>
-                <option value="<%= url_for('gits_new') %>">            <%=l 'New repo' %>
-                <option value="<%= url_for('gits_key_form') %>">       <%=l 'Add key' %>
-                <option value="<%= url_for('gits_server_key_form') %>"><%=l 'Add server' %>
-            </select>
+            <div class="alignleft nav_item">
+                <a href="<%= url_for('gits_index') %>">Git</a>
+                <ul>
+                    <li><a href="<%= url_for('gits_index') %>"><%=l 'Repos' %></a></li>
+                    <li><a href="<%= url_for('gits_new') %>"><%=l 'New repo' %></a></li>
+                    <li><a href="<%= url_for('gits_key_form') %>"><%=l 'Add key' %></a></li>
+                    <li><a href="<%= url_for('gits_server_key_form') %>"><%=l 'Add server' %></a></li>
+                 </ul>
+            </div>
             
             <!-- Right Align -->
             <div  class=alignright style="padding-right:10px">
             % if ( user->is_admin ) {
-                <select onChange="this.value[0] == '/' ? document.location = this.value : hide(this.value);">
-                    <option selected style="display:none">                      <%=l 'Admin' %>
-                    <option value="<%= url_for('mojo_m_list') %>">              <%=l 'Data Base' %>
-                    <option value="<%= url_for('config_index') %>">             <%=l 'Configs' %>
-                </select>
+                <div class="alignleft nav_item">
+                    <a href="#" onClick="return false;">Admin</a>
+                    <ul>
+                        <li><a href="<%= url_for('mojo_m_list') %>"><%=l 'Data Base' %></a></li>
+                        <li><a href="<%= url_for('config_index') %>"><%=l 'Configs' %></a></li>
+                    </ul>
+                </div>
             % }
             
-                <select onChange="this.value[0] == '/' ? document.location = this.value : hide(this.value);">
-                    <option selected style="display:none"> <%= user->name %>
+                
+                <div class="alignleft nav_item">
+                
                 % if ( user->id != 1 ) {
-                    <option value="<%= url_for('users_read', id => user->id) %>"> <%=l 'Profile' %>
-                    <option value="<%= url_for('auths_logout') %>">               <%=l 'Logout' %>
+                    <a href="<%= url_for('users_read', id => user->id) %>"><%= user->name ? user->name : 'Profile' %></a>
                 % } else {
-                    <option value="login_form">                                   <%=l 'Login' %>
-                    <option value="login_via_mail">                               <%=l 'Login via mail' %>
-                    <option value="register_form">                                <%=l 'Register' %>
+                    <a href="#" onClick="hide('login_form')"><%=l 'Login' %></a>
                 % }
-                </select>
+                
+                    <ul>
+                % if ( user->id != 1 ) {
+                    <li><a href="<%= url_for('auths_logout') %>"><%=l 'Logout' %></a></li>
+                % } else {
+                    <li><a href="#" onClick="hide('login_via_mail')"><%=l 'Login via mail' %></a></li>
+                    <li><a href="#" onClick="hide('register_form')"><%=l 'Register' %></a></li>
+                % }
+                    </ul>
+                </div>
             </div>
         </nav>
         <header>

@@ -1,4 +1,4 @@
-% extends 'admin_base';
+% extends 'base';
 % use Mojo::Util qw/camelize/;
 
 % content header => begin

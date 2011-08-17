@@ -71,3 +71,16 @@ function addValue(id, val) {
 
 /* Check forms */
 var elements = new Array();
+
+$(document).ready( function(){
+
+    $('div.nav_item').hover(
+        function(){
+            $(this).find('ul').fadeIn(300);
+        },
+        function(){
+            $(this).find('ul').fadeOut(300);
+        }
+    );
+    
+});
