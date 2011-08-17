@@ -72,7 +72,7 @@
         <footer>
             <a href="#top" class="alignleft"><%=l 'top' %></a>
             <div class="aligncenter">
-                Thanks for using Gitty.
+                <small>Powered by <a href="http://lorcode.org/">LorCode</a>.</small>
             </div>
         </footer>
     </body>
