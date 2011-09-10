@@ -1,0 +1,92 @@
+
+=head1 OVERVIEW
+
+Database interface.
+
+=head2 Methods
+
+All methods can return string, hash and array.
+
+=over
+
+=item create
+
+Create database record. Returning id (or some thing like id) of new record.
+
+=item read
+
+Read data from database by anonymous hash. 
+
+=item update
+
+Update data. Use 2 anonymous hashes: one for new data, one for searching.
+
+=item delete
+
+Delete a record from database.
+
+=item list
+
+Works like read, but returns many records.
+
+=item count
+
+How much records can get by this request.
+
+=back
+
+=head2 Params
+
+Array of params.
+
+=over
+
+=item set
+
+Set of records, like a table in SQL database.
+
+=item type
+
+Type of output. Can be hash, array and string.
+
+=item data
+
+Data for request. For create it will be hash like that:
+
+    {
+        'first name'  => 'Gosha',
+        'last name'   => 'Bugov',
+        'web'         => 'http://lorcode.org',
+        'password'    => md5_hex('secret')
+    }
+
+For update it can be
+
+    {
+        data  => { secret => md5_hex('new secret') },
+        where => { id     => 123 }
+    }
+
+=back
+
+=head1 EXAMPLE
+
+    # Create database handler
+    my $db = new Gitty::Db( Gitty::Db::Redis =>
+                            { server => '192.168.0.1:6379' } );
+    
+    # Get hash from DB
+    my $hashref = $db->read( User => hash => { id => 831105 } );
+    
+    # Init user by data from DB
+    my $user = new Gitty::User($hashref);
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011, Georgy Bazhukov.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut
+

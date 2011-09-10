@@ -1,8 +1,0 @@
-% extends 'base';
-% content_for body => begin
-    <div class=page>
-        <div class="rounded done">
-            <%= $message %>
-        </div>
-    </div><!--
-% end
