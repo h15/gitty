@@ -1,18 +1,18 @@
 package Gitty::Db;
 use Mojo::Base 'Class::Singleton';
-use Carp;
 
 has driver => undef;
 
-sub new
+sub init
     {
         my ( $this, $driver, $options ) = @_;
         
-        eval "use $driver";
-        carp "Can't load driver $driver" if $@;
+        $options ||= {};
         
-        $this->driver = $driver->new($options);
-        $this->SUPER::new();
+        eval "use $driver";
+        die "[-] Can't load driver $driver.\n$@\n" if $@;
+        
+        $this->driver( $driver->new($options) );
     }
 
 sub create
@@ -21,7 +21,7 @@ sub create
         
         $this->driver->can('create') ?
             $this->driver->create(@params) :
-            carp "Can't find method 'create' in " . $this->driver;
+            die "Can't find method 'create' in " . $this->driver;
     }
 
 sub read
@@ -30,7 +30,7 @@ sub read
         
         $this->driver->can('read') ?
             $this->driver->read(@params) :
-            carp "Can't find method 'read' in " . $this->driver;
+            die "Can't find method 'read' in " . $this->driver;
     }
 
 sub update
@@ -39,7 +39,7 @@ sub update
         
         $this->driver->can('update') ?
             $this->driver->update(@params) :
-            carp "Can't find method 'update' in " . $this->driver;
+            die "Can't find method 'update' in " . $this->driver;
     }
 
 sub delete
@@ -48,7 +48,7 @@ sub delete
         
         $this->driver->can('delete') ?
             $this->driver->delete(@params) :
-            carp "Can't find method 'delete' in " . $this->driver;
+            die "Can't find method 'delete' in " . $this->driver;
     }
 
 sub list
@@ -57,7 +57,7 @@ sub list
         
         $this->driver->can('list') ?
             $this->driver->list(@params) :
-            carp "Can't find method 'list' in " . $this->driver;
+            die "Can't find method 'list' in " . $this->driver;
     }
 
 sub count
@@ -66,7 +66,7 @@ sub count
         
         $this->driver->can('count') ?
             $this->driver->count(@params) :
-            carp "Can't find method 'count' in " . $this->driver;
+            die "Can't find method 'count' in " . $this->driver;
     }
 
 1;

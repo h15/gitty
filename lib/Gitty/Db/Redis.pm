@@ -1,83 +1,81 @@
 package Gitty::Db::Redis;
+use Mojo::Base -base;
 use Redis;
-use Carp;
-use feature qw/switch/;
 
-has redis => undef;
+has redis  => undef;
+has prefix => 'Eerahk2I';
 
 sub new
     {
         my ( $this, $options ) = @_;
-        $this->redis = new Redis(%$options);
         $this->SUPER::new();
+        $this->redis( new Redis(%$options) );
     }
 
 sub create
     {
-        my ( $this, $type, $data ) = @_;
+        my ( $this, $set, $data ) = @_;
+        my $px = $this->prefix;
+        my $id = $this->redis->incr("$px.$set.id");
         
-        given($type)
-        {
-            when('hash')
-            {
-                
-            }
-            
-            when('array')
-            {
-                
-            }
-            
-            when('string')
-            {
-            
-            }
-        }
+        $this->redis->hmset("$px.$set.$id", %$data);
+        
+        return $id;
     }
 
 sub read
     {
-        my ( $this, $type, $data ) = @_;
+        my ( $this, $set, $data ) = @_;
+        my $px = $this->prefix;
+        my $id = $this->_getId(@$data);
         
-        $this->driver->can('read') ?
-            $this->driver->read($data) :
-            carp "Can't find method 'read' in " . $this->driver;
+        return $this->redis->hgetall("$px.$set.$id");
     }
 
 sub update
     {
-        my ( $this, $type, $data ) = @_;
+        my ( $this, $set, $data ) = @_;
+        my $px    = $this->prefix;
+        my $where = $data->{where};
+           $data  = $data->{data};
         
-        $this->driver->can('update') ?
-            $this->driver->update($data) :
-            carp "Can't find method 'update' in " . $this->driver;
+        my $id = $this->_getId(@$where);
+        
+        $this->redis->hmset("$px.$set.$id", %$data);
     }
 
 sub delete
     {
-        my ( $this, $type, $data ) = @_;
+        my ( $this, $set, $data ) = @_;
+        my $px = $this->prefix;
+        my $id = $this->_getId(@$data);
         
-        $this->driver->can('delete') ?
-            $this->driver->delete($data) :
-            carp "Can't find method 'delete' in " . $this->driver;
+        $this->redis->del("$px.$set.$id");
     }
 
 sub list
     {
-        my ( $this, $type, $data ) = @_;
+        my ( $this, $set, $data ) = @_;
+        my @ret;
         
-        $this->driver->can('list') ?
-            $this->driver->list($data) :
-            carp "Can't find method 'list' in " . $this->driver;
+        push @ret, $this->read($set, [id => $_]) for @$data;
     }
 
 sub count
     {
-        my ( $this, $type, $data ) = @_;
+        my ( $this, $set, $data ) = @_;
+        my $px = $this->prefix;
+        my $id = $this->_getId(@$data);
         
-        $this->driver->can('count') ?
-            $this->driver->count($data) :
-            carp "Can't find method 'count' in " . $this->driver;
+        $this->redis->hlen("$px.$set.$id");
+    }
+
+sub _getId
+    {
+        my ( $this, $set, $key, $val ) = @_;
+        my $px = $this->prefix;
+
+        return $this->redis->get("$px.$set.${key}2id.$val");
     }
 
 1;
