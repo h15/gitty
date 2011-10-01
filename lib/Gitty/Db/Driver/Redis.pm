@@ -1,4 +1,4 @@
-package Gitty::Db::Redis;
+package Gitty::Db::Driver::Redis;
 use Mojo::Base -base;
 use Redis;
 

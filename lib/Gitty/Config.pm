@@ -1,7 +1,8 @@
 package Gitty::Config;
 use Mojo::Base 'Class::Singleton';
-use Carp;
+
 use Storable qw/freeze thaw/;
+use Carp;
 
 has configs => sub { {} };
 has file    => './lib/Gitty/Config/config.dat';

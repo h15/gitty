@@ -1,4 +1,71 @@
-<!doctype html><html>
-  <head><title><%= title %></title></head>
-  <body><%= content %></body>
+% languages 'ru';
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+%= stylesheet '/css/main.css'
+%= javascript 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js'
+%= javascript '/js/main.js'
+    <title>
+      <%= title %>
+    </title>
+  </head>
+  <body>
+  
+<!--
+    Horizontal menu
+                   -->
+
+    <nav class=horizontal>
+      <ul>      
+% for my $k ( keys %$horiNav ) {
+        <a href="<%=url_for $k %>">
+          <li><%=l $horiNav->{$k} %></li>
+        </a>
+% }
+      </ul>
+    </nav>
+
+<!--
+    Page header and description
+                               -->
+
+    <header>
+      <h1><%= title %></h1>
+      <p class=desc><%= desc %></p>
+    </header>
+    
+    <div class=page>
+
+<!--
+    Vertical menu
+                 -->
+
+      <nav class=vertical>
+% for my $k ( keys %$vertNav ) {
+        <a href="<%=url_for $k %>">
+          <li><%=l $vertNav->{$k} %></li>
+        </a>
+% }
+      </nav>
+
+<!--
+    Main content zone
+                     -->
+
+      <article class=content>
+          <%= content %>
+      </article>
+      
+    </div>
+
+<!--
+    Footer for all pages
+                        -->
+
+    <footer>
+    </footer>
+    
+  </body>
 </html>

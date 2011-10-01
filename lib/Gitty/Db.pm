@@ -9,7 +9,7 @@ sub init
         
         $options ||= {};
         
-        eval "use $driver";
+        eval "use Gitty::Db::Driver::$driver";
         die "[-] Can't load driver $driver.\n$@\n" if $@;
         
         $this->driver( $driver->new($options) );
