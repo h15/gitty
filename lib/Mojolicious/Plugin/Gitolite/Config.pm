@@ -1,16 +1,25 @@
 package Mojolicious::Plugin::Gitolite::Config;
-use Pony::Object;
+use Pony::Object 'singleton';
 
     /**
      *  Configure Gitolite config file
      *  from usual perl script.
      */
     
-    has groups      => {};
+    has groups      => [];
     has repos       => {};
     has file        => undef;
     has groupRights => {};
-        
+    
+    /**
+     *  TODO: repo's groups.
+     */
+    # has repoGroups  => [];
+    
+    /**
+     *  Parse gitolite config
+     *  and init gitolite object.
+     */
     sub init
         {
             my ( $this, $args ) = @_;
@@ -34,7 +43,7 @@ use Pony::Object;
                         /**
                          *  Gitolite groups definitions.
                          */
-                        when( /^\s*\@($w)\s*=\s*((?:$w\s+)+)$/ )
+                        when ( /^\s*\@($w)\s*=\s*((?:$w\s+)+)$/ )
                         {
                             for my $gr ( split /\s+/, $2 )
                             {
@@ -51,9 +60,9 @@ use Pony::Object;
                         }
                         
                         /**
-                         *  Repo define start
+                         *  Repo define start.
                          */
-                        when( /^\s*repo\s+((?:$w\s+)+)\s*$/ )
+                        when ( /^\s*repo\s+((?:$w\s+)+)\s*$/ )
                         {
                             my @repos = split /\s+/, $1;
                             undef @curRepos;
@@ -73,18 +82,21 @@ use Pony::Object;
                         }
                         
                         /**
-                         *  Define user's rights for repos.
+                         *  Define user's rights for repos
+                         *  and save groups rights.
                          */
-                        when( /^\s*(-|R|RW\+?C?D?)\s*=\s*((?:$w\s+)+)$/ )
+                        when ( /^\s*(-|R|RW\+?C?D?)\s*=\s*((?:$w\s+)+)$/ )
                         {
                             my @rights = split //, $1;
                             my @users;
+                            my @groups;
                             
                             for my $gr ( split /\s+/, $2 )
                             {
                                 if ( substr($gr, 0, 1) eq '@' )
                                 {
                                     $gr = substr $gr, 1;
+                                    push @groups, $gr;
                                     push @users, @{ $this->groups->{$gr} };
                                 }
                                 else
@@ -95,7 +107,7 @@ use Pony::Object;
                             
                             for my $re ( @curRepos )
                             {
-                                for my $user ( @users )
+                                for my $user ( @users, @groups )
                                 {
                                     for my $ri ( @rights )
                                     {
@@ -103,6 +115,11 @@ use Pony::Object;
                                     }
                                 }
                             }
+                        }
+                        
+                        when ( /^#/ )
+                        {
+                            // skip comments
                         }
                     }
                 }
@@ -196,13 +213,39 @@ use Pony::Object;
             /**
              *  Dump repos
              */
-            
+            for my $name ( keys %{ $this->repos } )
+            {
+                my $repo = $this->repos->{$r};
+                
+                $config .= "repo $name\n";
+                
+                for my $user ( keys %$repo )
+                {
+                    if ( in $this->groups, $user )
+                    {
+                        for my $ri ( $repo->{$user} )
+                        {
+                            /**
+                             *  If user and his group
+                             *  has similar rights.
+                             */
+                            unless ( $repo->{$} )
+                        }
+                    }
+                }
+            }
             
             open F, '>', $self->{file};
             print F $str;
             close F;
         }
 
+    sub in
+        {
+            my ( $array, $el ) = @_;
+            
+            grep { $_ eq $el } @$array ? 1 : 0;
+        }
 1;
 
 __END__
