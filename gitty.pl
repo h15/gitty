@@ -10,7 +10,7 @@ use Digest::MD5 qw(md5_hex);
 use Data::Dumper;
 use constant { true => 1, false => 0 };
 
-our $VERSION = '1.alpha';
+our $VERSION = '1.beta';
 
 
 #--------------------------------------------------------------------- Init --#
@@ -674,11 +674,12 @@ html {
   background: -webkit-gradient(linear, left top, left bottom, from(#5699A9), to(#ffffff)); /* for webkit browsers */
   background: -moz-linear-gradient(top, #5699A9, #ffffff); /* for firefox 3.6+ */
   background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 body {
   padding:0px;
   margin:10px 0px 0px 0px;
-  height:120%;
+  height:100%;
   width:100%;
   font-family:Sans;
   color:#444;
@@ -719,29 +720,32 @@ body>nav {
   font-family:Sans, Arial;
   background:#fff;
   border: 1px solid #fff;
-  -moz-border-radius:10px 10px 0px 0px;
-  -webkit-border-radius:10px 10px 0px 0px;
-  border-radius:10px 10px 0px 0px;
-  -khtml-border-radius:10px 10px 0px 0px;
+  -moz-border-radius:10px 10px 10px 10px;
+  -webkit-border-radius:10px 10px 10px 10px;
+  border-radius:10px 10px 10px 10px;
+  -khtml-border-radius:10px 10px 10px 10px;
 }
 body>header>h1 { color: #fff; }
 body>header { margin:20px auto; width:600px; }
-body>footer { margin:0px auto 20px auto; width:600px; }
+body>footer { margin:0px auto 20px auto; width:600px; height:20px; }
 .form { width:300px; }
 .form td { padding:5px; }
 .icon { height: 32px; }
 .wide { display:block; width:100%; }
 body>nav>div>a { background: #fff; color: #a44; padding: 4px; margin-right: 10px; display: block; float: left;   -moz-border-radius: 5px;  -webkit-border-radius: 5px;  border-radius: 5px;  -khtml-border-radius: 5px;}
 body>nav>div>a:hover { color: #a00; text-decoration: underline; }
+.powered { text-align:center;font-size:12px;margin:20px 0px; }
 
 
 @@ layouts/default.html.ep
 <!doctype html>
 <html>
-<head>
-<title><%= title %></title>
-<link href="/css/style.css" rel="stylesheet">
-</head>
+  <head>
+    <title><%= title %></title>
+    <link href="/css/style.css" rel="stylesheet">
+    <meta name="generator" content="Gitty <%= $::VERSION %>">
+    <meta charset="utf-8">
+  </head>
   <body>
     <nav>
       % if (session('id') && session('id') == 1) {
@@ -768,15 +772,14 @@ body>nav>div>a:hover { color: #a00; text-decoration: underline; }
     </header>
     <div class=cb></div>
     <article class="page">
-      <%= content %>
-    </article>
-    
-    <footer>
-      <div style="text-align:center;font-size:10px;">Powered by <a href="http://github.com/h15/gitty">Gitty</a> /
-        <a href="http://mojolicio.us">Mojolicious</a> /
-        <a href="http://perl.org">Perl</a>
+      <div style="height: 100%;">
+        <%= content %>
       </div>
-    </footer>
+    </article>
+    <div class="powered">Powered by <a href="http://github.com/h15/gitty">Gitty</a> /
+      <a href="http://mojolicio.us">Mojolicious</a> /
+      <a href="http://perl.org">Perl</a>
+    </div>
   </body>
 </html>
 
@@ -822,7 +825,7 @@ body>nav>div>a:hover { color: #a00; text-decoration: underline; }
 
 
 @@ index.html.ep
-% layout 'default', title => $hi;
+% layout 'default', title => "$hi!";
 
 
 @@ user/login.html.ep
@@ -854,7 +857,7 @@ body>nav>div>a:hover { color: #a00; text-decoration: underline; }
 
 
 @@ admin/users.html.ep
-% layout 'default', title => 'Admin panel → Users';
+% layout 'default', title => 'Users';
 <form action="/admin/users" method="POST">
   <input name="user">
   <input name="pass" type="password">
