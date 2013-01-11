@@ -10,7 +10,7 @@ use Digest::MD5 qw(md5_hex);
 use Data::Dumper;
 
 
-our $VERSION = '1.prealpha';
+our $VERSION = '1.alpha';
 
 
 #------------------------------------------------------------ Init database --#
@@ -964,5 +964,11 @@ Get admin repo (run as git-admin user).
 =head2 Install Perl modules
 
   sudo cpan Mojolicious DBI DBD::SQLite
+
+=head1 Using
+
+  perl ./gitty.pl
+
+Runs HTTP daemon on 3000 port.
 
 =cut

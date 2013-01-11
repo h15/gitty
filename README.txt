@@ -34,3 +34,8 @@ How to install
   Install Perl modules
       sudo cpan Mojolicious DBI DBD::SQLite
 
+Using
+      perl ./gitty.pl
+
+    Runs HTTP daemon on 3000 port.
+
