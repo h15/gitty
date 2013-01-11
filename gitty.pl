@@ -8,12 +8,12 @@ use feature ':5.10';
 use Mojolicious::Lite;
 use Digest::MD5 qw(md5_hex);
 use Data::Dumper;
-
+use constant { true => 1, false => 0 };
 
 our $VERSION = '1.alpha';
 
 
-#------------------------------------------------------------ Init database --#
+#--------------------------------------------------------------------- Init --#
 
 our $dbh = DBI->connect("dbi:SQLite:dbname=./gitty.db",
                         '', '', { RaiseError => 1 })
@@ -56,17 +56,18 @@ post '/install' => sub {
   
   Model->new->raw(q{
     CREATE TABLE config (
-      name VARCHAR(32) PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name VARCHAR(32) UNIQUE,
       value TEXT
     );
   });
-  Model->new->raw(qq{INSERT INTO config VALUES('salt'      , '$salt');});
-  Model->new->raw(qq{INSERT INTO config VALUES('secret_key', '$secret_key');});
-  Model->new->raw(qq{INSERT INTO config VALUES('gl_dir'    , '$gl_dir');});
+  Model->new->raw(qq{INSERT INTO config VALUES(1, 'salt'      , '$salt');});
+  Model->new->raw(qq{INSERT INTO config VALUES(2, 'secret_key', '$secret_key');});
+  Model->new->raw(qq{INSERT INTO config VALUES(3, 'gl_dir'    , '$gl_dir');});
   
   Model->new->raw(q{
     CREATE TABLE user (
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       name VARCHAR(32) UNIQUE,
       mail VARCHAR(32) UNIQUE,
       password VARCHAR(32),
@@ -77,12 +78,12 @@ post '/install' => sub {
   });
   Model->new->raw(qq{
     INSERT INTO user VALUES(1, 'admin', 'admin\@gitty',
-      '$admin_password_hash', 0, 0, 'Gitty Admin');
+      '$admin_password_hash', $time, 0, 'Gitty Admin');
   });
   
   Model->new->raw(q{
     CREATE TABLE key (
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
       name VARCHAR(32),
       key TEXT,
@@ -92,20 +93,24 @@ post '/install' => sub {
   
   Model->new->raw(q{
     CREATE TABLE 'group' (
-      name VARCHAR(32) PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name VARCHAR(32) UNIQUE,
       list TEXT
     );
   });
   
   Model->new->raw(q{
     CREATE TABLE repo (
-      name VARCHAR(32) PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name VARCHAR(32) UNIQUE,
       list TEXT
     );
   });
-  
+  #say Model->new('config')->read(name => 'secret_key')->{value};
+  #app->secret( Model->new('config')->read(name => 'secret_key')->{value} );
   $self->session(id => 1, name => 'admin', mail => 'admin@gitty',
                  regdate => $time, key_count => 0);
+  
   return $self->redirect_to('/admin');
 };
 
@@ -128,10 +133,11 @@ post '/user/login' => sub {
   my $self = shift;
   my $user = $self->param('user');
   my $pass = $self->param('pass');
-  $user = Model->new('user')->read('name', $user);
+  $user = Model->new('user')->read(name => $user);
   
   if ($user) {
     my $salt = Model->new('config')->read(name => 'salt')->{value};
+    
     if ($user->{password} eq md5_hex("$salt-".$user->{regdate}."-$pass")) {
       $self->session(id => $user->{id}, name => $user->{name},
                      mail => $user->{mail}, regdate => $user->{regdate},
@@ -150,208 +156,242 @@ post '/user/login' => sub {
 };
 
 
-get '/admin' => sub {
-  my $self = shift;
-  $self->render('admin/index');
-};
+#------------------------------------------------------------- User section --#
 
-
-get '/admin/users' => sub {
-  my $self = shift;
-  my @users = Model->new('user')->list;
-  $self->stash({users => \@users})->render('admin/users');
-};
-
-
-post '/admin/users' => sub {
-  my $self = shift;
-  my $time = time;
-  my $user = $self->param('user');
-  my $pass = $self->param('pass');
-  my $salt = Model->new('config')->read(name => 'salt')->{value};
+group {
+  under '/user' => sub {
+    my $self = shift;
+    return true if access('user', $self->session('id'));
+    return false;
+  };
   
-  Model->new('user')->create({
-    name => $self->param('user'),
-    password => md5_hex("$salt-$time-$pass"),
-    regdate => $time,
-    });
   
-  $self->redirect_to('/admin/users');
-};
-
-
-get '/user/home' => sub {
-  my $self = shift;
-  my $user_id = $self->session('id');
-  my $user = Model->new('user')->read(id => $user_id);
-  $self->stash({user => $user})->render('user/home');
-};
-
-
-post '/user/home' => sub {
-  my $self = shift;
-  my $pass = $self->param('password');
-  my $time = $self->session('regdate');
-  my $salt = Model->new('config')->read(name => 'salt')->{value};
+  get '/home' => sub {
+    my $self = shift;
+    my $user_id = $self->session('id');
+    my $user = Model->new('user')->read(id => $user_id);
+    $self->stash({user => $user})->render('user/home');
+  };
   
-  my $data = {
-    name => $self->param('name'),
-    mail => $self->param('mail'),
-    info => $self->param('info'),
-    };
   
-  $data = { %$data, password => md5_hex("$salt-$time-$pass") } if $pass;
-  Model->new('user')->update($data, { id => $self->session('id') });
-  $self->redirect_to('/user/home');
-};
-
-
-get '/user/keys' => sub {
-  my $self = shift;
-  my @keys = Model->new('key')->list({user_id => $self->session('id')});
-  $self->stash({keys => \@keys})->render('user/keys');
-};
-
-
-post '/user/keys' => sub {
-  my $self = shift;
-  my $name = $self->param('name');
-  my $key  = $self->param('key');
+  post '/home' => sub {
+    my $self = shift;
+    my $pass = $self->param('password');
+    my $time = $self->session('regdate');
+    my $salt = Model->new('config')->read(name => 'salt')->{value};
+    
+    my $data = {
+      mail => $self->param('mail'),
+      info => $self->param('info'),
+      };
+    
+    $data = { %$data, password => md5_hex("$salt-$time-$pass") } if $pass;
+    Model->new('user')->update($data, { id => $self->session('id') });
+    $self->redirect_to('/user/home');
+  };
   
-  Model->new('key')->create({
-    user_id => $self->session('id'),
-    name => $name,
-    key => $key
-    });
   
-  push_admin_config();
+  get '/keys' => sub {
+    my $self = shift;
+    my @keys = Model->new('key')->list({user_id => $self->session('id')});
+    $self->stash({keys => \@keys})->render('user/keys');
+  };
   
-  $self->redirect_to('/user/keys');
-};
-
-
-get '/admin/repos' => sub {
-  my $self = shift;
-  my @groups = Model->new('group')->list;
-  my @repos = Model->new('repo')->list;
-  $self->stash({repos => \@repos, groups => \@groups})->render('admin/repos');
-};
-
-
-post '/admin/repos' => sub {
-  my $self = shift;
-  my $name = $self->param('name');
-  my $desc = $self->param('desc');
-  my $list = $self->param('list'); # user list
   
-  Model->new('repo')->create({
-    name => $name,
-    desc => $desc,
-    list => $list
-    });
+  post '/keys' => sub {
+    my $self = shift;
+    my $name = $self->param('name');
+    my $key  = $self->param('key');
+    
+    Model->new('key')->create({
+      user_id => $self->session('id'),
+      name => $name,
+      key => $key
+      });
+    
+    push_admin_config();
+    
+    $self->redirect_to('/user/keys');
+  };
+};
+
+
+#------------------------------------------------------------ Admin section --#
+
+group {
+  under '/admin' => sub {
+    my $self = shift;
+    return true if access('admin', $self->session('id'));
+    return false;
+  };
   
-  $self->redirect_to('/admin/repos');
-};
-
-
-get '/admin/groups' => sub {
-  my $self = shift;
-  my @groups = Model->new('group')->list;
-  $self->stash({groups => \@groups})->render('admin/groups');
-};
-
-
-post '/admin/groups' => sub {
-  my $self = shift;
-  my $name = $self->param('name');
-  my $desc = $self->param('desc');
-  my $list = $self->param('list');
   
-  Model->new('group')->create({
-    name => $name,
-    desc => $desc,
-    list => $list
-    });
+  get '/' => sub {
+    my $self = shift;
+    $self->render('admin/index');
+  };
   
-  $self->redirect_to('/admin/groups');
-};
-
-
-get '/admin/config/startup' => sub {
-  my $self = shift;
-  my ($groups, $repos) = parse_gitolite_config();
-  $self->stash({groups => $groups, repos => $repos})->render('admin/startup');
-};
-
-
-# Load startup-config.
-post '/admin/config/startup' => sub {
-  my $self = shift;
-  my ($groups, $repos) = parse_gitolite_config();
-  save_gitolite_config_to_db($groups, $repos);
-  $self->redirect_to('/admin/config/running');
-};
-
-
-get '/admin/config/gitty' => sub {
-  my $self = shift;
-  my $secret_key = Model->new('config')->read({name => 'secret_key'})->{value};
-  my $gl_dir = Model->new('config')->read({name => 'gl_dir'})->{value};
-  $self->stash({secret_key => $secret_key, gl_dir => $gl_dir})
-    ->render('admin/gitty');
-};
-
-
-post '/admin/config/gitty' => sub {
-  my $self = shift;
-  my $secret_key = $self->param('secret_key');
-  my $gl_dir = $self->param('gl_dir');
-  Model->new('config')->update({value => $secret_key}, {name => 'secret_key'});
-  Model->new('config')->update({value => $gl_dir}, {name => 'gl_dir'});
-  $self->redirect_to('/admin/config/gitty');
-};
-
-
-get '/admin/config/running' => sub {
-  my $self = shift;
-  my ($groups, $repos) = get_gitolite_config_from_db();
-  my $text = generate_gitolite_config($groups, $repos);
   
-  $self->stash({groups => $groups, repos => $repos, conf => $text})
-    ->render('admin/running');
+  get '/users' => sub {
+    my $self = shift;
+    my @users = Model->new('user')->list;
+    $self->stash({users => \@users})->render('admin/users');
+  };
+  
+  
+  post '/users' => sub {
+    my $self = shift;
+    my $time = time;
+    my $user = $self->param('user');
+    my $pass = $self->param('pass');
+    my $salt = Model->new('config')->read(name => 'salt')->{value};
+    
+    Model->new('user')->create({
+      name => $self->param('user'),
+      password => md5_hex("$salt-$time-$pass"),
+      regdate => $time,
+      });
+    
+    $self->redirect_to('/admin/users');
+  };
+  
+  
+  get '/repos' => sub {
+    my $self = shift;
+    my @groups = Model->new('group')->list;
+    my @repos = Model->new('repo')->list;
+    $self->stash({repos => \@repos, groups => \@groups})->render('admin/repos');
+  };
+  
+  
+  post '/repos' => sub {
+    my $self = shift;
+    my $name = $self->param('name');
+    my $desc = $self->param('desc');
+    my $list = $self->param('list'); # user list
+    
+    Model->new('repo')->create({
+      name => $name,
+      desc => $desc,
+      list => $list
+      });
+    
+    $self->redirect_to('/admin/repos');
+  };
+  
+  
+  get '/groups' => sub {
+    my $self = shift;
+    my @groups = Model->new('group')->list;
+    $self->stash({groups => \@groups})->render('admin/groups');
+  };
+  
+  
+  post '/groups' => sub {
+    my $self = shift;
+    my $name = $self->param('name');
+    my $desc = $self->param('desc');
+    my $list = $self->param('list');
+    
+    Model->new('group')->create({
+      name => $name,
+      desc => $desc,
+      list => $list
+      });
+    
+    $self->redirect_to('/admin/groups');
+  };
+  
+  
+  get '/config/startup' => sub {
+    my $self = shift;
+    my ($groups, $repos) = parse_gitolite_config();
+    $self->stash({groups => $groups, repos => $repos})->render('admin/startup');
+  };
+  
+  
+  # Load startup-config.
+  post '/config/startup' => sub {
+    my $self = shift;
+    my ($groups, $repos) = parse_gitolite_config();
+    save_gitolite_config_to_db($groups, $repos);
+    $self->redirect_to('/admin/config/running');
+  };
+  
+  
+  get '/config/gitty' => sub {
+    my $self = shift;
+    my $secret_key = Model->new('config')->read({name => 'secret_key'})->{value};
+    my $gl_dir = Model->new('config')->read({name => 'gl_dir'})->{value};
+    $self->stash({secret_key => $secret_key, gl_dir => $gl_dir})
+      ->render('admin/gitty');
+  };
+  
+  
+  post '/config/gitty' => sub {
+    my $self = shift;
+    my $secret_key = $self->param('secret_key');
+    my $gl_dir = $self->param('gl_dir');
+    Model->new('config')->update({value => $secret_key}, {name => 'secret_key'});
+    Model->new('config')->update({value => $gl_dir}, {name => 'gl_dir'});
+    $self->redirect_to('/admin/config/gitty');
+  };
+  
+  
+  get '/config/running' => sub {
+    my $self = shift;
+    my ($groups, $repos) = get_gitolite_config_from_db();
+    my $text = generate_gitolite_config($groups, $repos);
+    
+    $self->stash({groups => $groups, repos => $repos, conf => $text})
+      ->render('admin/running');
+  };
+  
+  
+  # Save running-config to startup-config.
+  post '/config/running/to/startup' => sub {
+    my $self = shift;
+    my $gl_dir = Model->new('config')->read(name => 'gl_dir')->{value};
+    my ($groups, $repos) = get_gitolite_config_from_db();
+    my $text = generate_gitolite_config($groups, $repos);
+    
+    open CONFIG, ">$gl_dir/conf/gitolite.conf"
+      or die "Can't find gitolite config file.";
+    print CONFIG $text;
+    close CONFIG;
+    
+    push_admin_config();
+    
+    $self->redirect_to('/admin/config/running');
+  };
+  
+  
+  post '/config/running' => sub {
+    my $self = shift;
+    my $conf = $self->param('conf');
+    my ($groups, $repos) = parse_gitolite_config($conf);
+    save_gitolite_config_to_db($groups, $repos);
+    $self->redirect_to('/admin/config/running');
+  };
 };
 
-
-# Save running-config to startup-config.
-post '/admin/config/running/to/startup' => sub {
-  my $self = shift;
-  my $gl_dir = Model->new('config')->read(name => 'gl_dir')->{value};
-  my ($groups, $repos) = get_gitolite_config_from_db();
-  my $text = generate_gitolite_config($groups, $repos);
-  
-  open CONFIG, ">$gl_dir/conf/gitolite.conf"
-    or die "Can't find gitolite config file.";
-  print CONFIG $text;
-  close CONFIG;
-  
-  push_admin_config();
-  
-  $self->redirect_to('/admin/config/running');
-};
-
-
-post '/admin/config/running' => sub {
-  my $self = shift;
-  my $conf = $self->param('conf');
-  my ($groups, $repos) = parse_gitolite_config($conf);
-  save_gitolite_config_to_db($groups, $repos);
-  $self->redirect_to('/admin/config/running');
-};
-
-app->start('daemon');
+app->start;
 
 
 #--------------------------------------------------------- Useful functions --#
+
+sub access {
+  my $level = shift || 'user'; # required access level
+  my $user_id = shift || 0;
+  
+  given($level) {
+    when('user') { return true if $user_id }
+    when('admin') { return true if $user_id == 1 }
+  }
+  
+  return false;
+}
+
 
 sub push_admin_config {
   my $self = shift;
@@ -624,14 +664,14 @@ __DATA__
 <!doctype html>
 <html>
 <head>
-<title><% title %></title>
+<title><%= title %></title>
 <style>
 body{ font-family: mono; }
 </style>
 </head>
   <body>
     <div>
-    % if (session('id') > 0) {
+    % if (session('id') && session('id') > 0) {
       <a href="/user/keys">Keys</a>
       <a href="/user/home">Home</a>
       <a href="/user/logout">Logout</a>
@@ -639,7 +679,7 @@ body{ font-family: mono; }
       <a href="/user/login">Login</a>
     % }
     </div>
-    % if (session('id') == 1) {
+    % if (session('id') && session('id') == 1) {
       <div>
         <a href="/admin/users">Users</a>
         <a href="/admin/config/startup">Startup-Config</a>
@@ -647,17 +687,17 @@ body{ font-family: mono; }
         <a href="/admin/config/gitty">Gitty-Config</a>
       </div>
     % }
+  <h1><%= title %></h1>
   <%= content %>
   </body>
 </html>
 
 
 @@ install.html.ep
-% layout 'default', title => 'Installed';
-<h1>Gitty config</h1>
+% layout 'default', title => 'Install Gitty';
 <div class="error">
 % if ($error eq 'bad_params') {
-  Something went wrong!
+  Bad params!
 % }
 </div>
 <form action="/install" method="POST">
@@ -730,7 +770,7 @@ body{ font-family: mono; }
   <table>
     <tr>
       <td>Name</td>
-      <td><input name="name" value='<%= $user->{name} %>'></td>
+      <td><%= $user->{name} %></td>
     </tr>
     <tr>
       <td>E-mail</td>
@@ -919,6 +959,10 @@ body{ font-family: mono; }
   <textarea name="conf"><%= $conf %></textarea>
   <input type="submit" value="Change running-config">
 </form>
+
+
+@@ not_found.html.ep
+% layout 'default', title => 'Page does not found';
 
 
 __END__
