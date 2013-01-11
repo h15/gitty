@@ -117,6 +117,13 @@ get '/user/login' => sub {
 };
 
 
+get '/user/logout' => sub {
+  my $self = shift;
+  $self->session(id => 0);
+  $self->redirect_to('/');
+};
+
+
 post '/user/login' => sub {
   my $self = shift;
   my $user = $self->param('user');
@@ -216,6 +223,8 @@ post '/user/keys' => sub {
     name => $name,
     key => $key
     });
+  
+  push_admin_config();
   
   $self->redirect_to('/user/keys');
 };
@@ -325,6 +334,8 @@ post '/admin/config/running/to/startup' => sub {
   print CONFIG $text;
   close CONFIG;
   
+  push_admin_config();
+  
   $self->redirect_to('/admin/config/running');
 };
 
@@ -341,6 +352,15 @@ app->start('daemon');
 
 
 #--------------------------------------------------------- Useful functions --#
+
+sub push_admin_config {
+  my $self = shift;
+  my $gl_dir = Model->new('config')->read(name => 'gl_dir')->{value};
+  save_keys_to_fs();
+  say "Update admin config...";
+  say `cd $gl_dir && git add . && git commit -m 'update' && git push`;
+}
+
 
 sub parse_gitolite_config {
   my @CONFIG;
@@ -462,9 +482,17 @@ sub save_keys_to_fs {
     my @keys = $model->list({ user_id => $user->{id} });
     
     for my $k (@keys) {
-      mkdir $root.$k->{id};
-      open PUB, '>', $root.$k->{id}.'/'.$user->{name}.'.pub'
-        or die "Can't write to public-key file.";
+      my $dir = $root.$user->{name}.'_'.$k->{id};
+      mkdir $dir unless -d $dir;
+      my $file = $dir.'/'.$user->{name}.'.pub';
+      
+      if (-r $file) {
+        open PUB, "> $file" or die "Can't write to public-key file.";
+      }
+      else {
+        open PUB, ">> $file" or die "Can't write to public-key file.";
+      }
+      
       print PUB $k->{key};
       close PUB;
     }
@@ -606,6 +634,7 @@ body{ font-family: mono; }
     % if (session('id') > 0) {
       <a href="/user/keys">Keys</a>
       <a href="/user/home">Home</a>
+      <a href="/user/logout">Logout</a>
     % } else {
       <a href="/user/login">Login</a>
     % }
