@@ -35,7 +35,7 @@ How to install
       sudo cpan Mojolicious DBI DBD::SQLite
 
 Using
-      perl ./gitty.pl
+      perl ./gitty.pl daemon -m production
 
     Runs HTTP daemon on 3000 port.
 

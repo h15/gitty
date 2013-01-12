@@ -399,7 +399,7 @@ sub push_admin_config {
   my $gl_dir = Model->new('config')->read(name => 'gl_dir')->{value};
   save_keys_to_fs();
   
-  $self->app->log->warn(
+  app->log->warn(
     "Update admin config...\n" .
     `cd $gl_dir && git add . && git commit -m 'update' && git push`);
 }
@@ -735,6 +735,7 @@ body>footer { margin:0px auto 20px auto; width:600px; height:20px; }
 body>nav>div>a { background: #fff; color: #a44; padding: 4px; margin-right: 10px; display: block; float: left;   -moz-border-radius: 5px;  -webkit-border-radius: 5px;  border-radius: 5px;  -khtml-border-radius: 5px;}
 body>nav>div>a:hover { color: #a00; text-decoration: underline; }
 .powered { text-align:center;font-size:12px;margin:20px 0px; }
+.keys { text-align: center; list-style: none; padding: 0px; }
 
 
 @@ layouts/default.html.ep
@@ -858,40 +859,46 @@ body>nav>div>a:hover { color: #a00; text-decoration: underline; }
 
 @@ admin/users.html.ep
 % layout 'default', title => 'Users';
-<form action="/admin/users" method="POST">
-  <input name="user">
-  <input name="pass" type="password">
-  <input type="submit" value="Create">
-</form>
-<ul>
-% for my $u (@$users) {
-  <li><%= $u->{name} %>(<%= $u->{mail} %>)</li>
-% }
-</ul>
+<div style="margin:30px;">
+  <form action="/admin/users" method="POST">
+    Name <input name="user" style="margin-right:20px;">
+    Password <input name="pass" type="password">
+    <input type="submit" value="Create">
+  </form>
+  <ul style="text-align:left;">
+  % for my $u (@$users) {
+    <li><%= $u->{name} %>(<%= $u->{mail} %>)</li>
+  % }
+  </ul>
+</div>
 
 
 @@ user/home.html.ep
 % layout 'default', title => 'User home';
 <form action="/user/home" method="POST">
-  <table>
+  <table class="form aligncenter" style="width:400px;margin-top:30px;">
     <tr>
       <td>Name</td>
-      <td><%= $user->{name} %></td>
+      <td><b><%= $user->{name} %></b></td>
     </tr>
     <tr>
       <td>E-mail</td>
-      <td><input name="mail" value='<%= $user->{mail} %>'></td>
-    </tr>
-    <tr>
-      <td>Info</td>
-      <td><textarea name="info"><%= $user->{info} %></textarea></td>
+      <td><input name="mail" class="wide" value='<%= $user->{mail} %>'></td>
     </tr>
     <tr>
       <td>Password *</td>
-      <td><input name="password" type="password"></td>
+      <td><input name="password" type="password" autocomplete="off" class="wide"></td>
     </tr>
     <tr>
-      <td colspan=2><input type="submit" value="Change"></td>
+      <td></td>
+      <td style="font-size:12px;">* — Leave it blank if don't wanna to change.</td>
+    </tr>
+    <tr valign="top">
+      <td>Info</td>
+      <td><textarea name="info" style="height:100px;" class="wide"><%= $user->{info} %></textarea></td>
+    </tr>
+    <tr>
+      <td colspan=2><input type="submit" value="Change" class="alignright"></td>
     </tr>
   </table>
 </form>
@@ -900,24 +907,24 @@ body>nav>div>a:hover { color: #a00; text-decoration: underline; }
 @@ user/keys.html.ep
 % layout 'default', title => 'Public keys';
 <form action="/user/keys" method="POST">
-  <table>
+  <table class="form aligncenter" style="width:400px;margin-top:30px;">
     <tr>
       <td>Name</td>
-      <td><input name="name"></td>
+      <td><input name="name" class="wide"></td>
     </tr>
-    <tr>
+    <tr valign="top">
       <td>Key</td>
-      <td><textarea name="key"></textarea></td>
+      <td><textarea name="key" class="wide" style="height:100px;"></textarea></td>
     </tr>
     <tr>
-      <td colspan=2><input type="submit" value="Add"></td>
+      <td colspan=2><input type="submit" class="alignright" value="Add public key"></td>
     </tr>
   </table>
 </form>
-<ul>
+<ul class="keys">
 % for my $k (@$keys) {
-  <li><%= $k->{name} %> (<%= substr($k->{key}, 0, 20) %> ...
-                         <%= substr($k->{key}, -20) %>)</li>
+  <li><%= $k->{name} %> (<code><%= substr($k->{key}, 0, 20) %> ...
+                         <%= substr($k->{key}, -20) %></code>)</li>
 % }
 </ul>
 
@@ -1008,17 +1015,17 @@ body>nav>div>a:hover { color: #a00; text-decoration: underline; }
 @@ admin/gitty.html.ep
 % layout 'default', title => 'Gitty config';
 <form action="/admin/config/gitty" method="POST">
-  <table>
+  <table class="form aligncenter" style="width:400px;margin-top:30px;">
     <tr>
       <td>Gitolite directory (gl_dir)</td>
-      <td><input name="gl_dir" value="<%= $gl_dir %>"></td>
+      <td><input name="gl_dir" class="wide" value="<%= $gl_dir %>"></td>
     </tr>
     <tr>
       <td>Secret key (secret_key)</td>
-      <td><input name="secret_key" value="<%= $secret_key %>"></td>
+      <td><input name="secret_key" class="wide" value="<%= $secret_key %>"></td>
     </tr>
     <tr>
-      <td colspan=2><input type="submit" value="Change"></td>
+      <td colspan=2><input type="submit" class="alignright" value="Change"></td>
     </tr>
   </table>
 </form>
@@ -1089,8 +1096,6 @@ __END__
 
 =head1 How to install
 
-Admin access - admin:nimda
-
 =head2 Prepare git user
 
 Install soft. Run as root.
@@ -1129,7 +1134,7 @@ Get admin repo (run as git-admin user).
 
 =head1 Using
 
-  perl ./gitty.pl
+  perl ./gitty.pl daemon -m production
 
 Runs HTTP daemon on 3000 port.
 
