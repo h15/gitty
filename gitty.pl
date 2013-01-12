@@ -1100,7 +1100,7 @@ __END__
 
 Install soft. Run as root.
 
-  aptitude install openssh-server git-core
+  sudo apt-get install openssh-server git-core
 
   adduser --system --shell /bin/sh --gecos 'git version control' --group \
           --disabled-password --home /home/git git
@@ -1112,21 +1112,25 @@ Create ssh key for git.
 Allow ssh support for git. Edit manually file C</etc/ssh/sshd_config>. Add user
 C<git> into line "AllowUsers".
 
-  /etc/init.d/ssh restart
+  sudo /etc/init.d/ssh restart
 
 =head2 Install Gitolite
 
 Run as root.
 
-  aptitude install gitolite
+  sudo apt-get install gitolite
 
 Run as git.
 
-  gl-setup ~/root.pub
+  sudo -u git gl-setup ~/root.pub
 
 Get admin repo (run as git-admin user).
 
   git clone git@server:gitolite-admin
+
+=head2 Install SQLite
+
+  sudo apt-get install sqlite
 
 =head2 Install Perl modules
 
